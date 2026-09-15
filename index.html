@@ -1189,14 +1189,13 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrtveOA99aJOGCWoHmq
 
 async function sheetsSync(params) {
   try {
-    const qs = Object.entries(params)
-      .map(([k,v]) => k + '=' + encodeURIComponent(typeof v === 'object' ? JSON.stringify(v) : String(v)))
-      .join('&');
-    const res = await fetch(SCRIPT_URL + '?' + qs);
+    // Wrap in payload so Apps Script can parse nested objects
+    const payload = encodeURIComponent(JSON.stringify(params));
+    const res = await fetch(SCRIPT_URL + '?payload=' + payload);
     const text = await res.text();
     return JSON.parse(text);
   } catch(e) {
-    console.warn('Sheets sync failed (offline?):', e.message);
+    console.warn('Sheets sync failed:', e.message);
     return { status: 'error' };
   }
 }
