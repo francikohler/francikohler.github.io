@@ -1189,11 +1189,21 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrtveOA99aJOGCWoHmq
 
 async function sheetsSync(params) {
   try {
-    // Wrap in payload so Apps Script can parse nested objects
-    const payload = encodeURIComponent(JSON.stringify(params));
-    const res = await fetch(SCRIPT_URL + '?payload=' + payload);
-    const text = await res.text();
-    return JSON.parse(text);
+    if (params.action === 'getEvents' || params.action === 'getSubmissions') {
+      // Use GET for reading
+      const res = await fetch(SCRIPT_URL + '?action=' + params.action);
+      const text = await res.text();
+      return JSON.parse(text);
+    } else {
+      // Use POST for writing (avoids URL length limits)
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(params)
+      });
+      const text = await res.text();
+      return JSON.parse(text);
+    }
   } catch(e) {
     console.warn('Sheets sync failed:', e.message);
     return { status: 'error' };
