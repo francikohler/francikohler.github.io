@@ -1190,17 +1190,16 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrtveOA99aJOGCWoHmq
 async function sheetsSync(params) {
   try {
     if (params.action === 'getEvents' || params.action === 'getSubmissions') {
-      // Use GET for reading
       const res = await fetch(SCRIPT_URL + '?action=' + params.action);
       const text = await res.text();
       return JSON.parse(text);
     } else {
-      // Use POST for writing (avoids URL length limits)
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(params)
-      });
+      // Strip checklist to keep URL short (checklist saved in localStorage)
+      if (params.event) {
+        params.event = Object.assign({}, params.event, { checklist: [] });
+      }
+      const payload = encodeURIComponent(JSON.stringify(params));
+      const res = await fetch(SCRIPT_URL + '?payload=' + payload);
       const text = await res.text();
       return JSON.parse(text);
     }
