@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Franci Kohler · Wedding Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+:root {
+  --gold:#D2AA82;--gold-dark:#B8895E;--gold-light:#E6D5BE;--gold-pale:#F7F0E6;
+  --gold-muted:#EDE0CE;--white:#FFFFFF;--off-white:#FAF7F3;--text:#3D2E1E;
+  --text-light:#8A7060;--text-muted:#B5A090;--border:#E8D9C5;
+  --success:#5A8A5E;--warning:#C4956A;--danger:#B5675B;
+  --shadow:0 2px 16px rgba(180,140,100,0.10);--shadow-lg:0 8px 40px rgba(180,140,100,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;font-size:14px;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--text);display:flex;flex-direction:column;z-index:100;padding:0 0 24px;}
+.sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(210,170,130,0.2);text-align:center;}
+.sidebar-logo img{border-radius:50%;width:72px;height:72px;object-fit:cover;border-radius:50%;opacity:1;}
+.sidebar-logo-name{font-family:'Cormorant Garamond',serif;color:var(--gold-light);font-size:12px;letter-spacing:0.1em;margin-top:7px;font-weight:300;line-height:1.5;}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto;}
+.nav-label{font-size:9px;letter-spacing:0.14em;color:rgba(181,160,144,0.45);padding:16px 20px 5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-size:13px;border-left:2px solid transparent;}
+.nav-item:hover{color:var(--gold-light);background:rgba(210,170,130,0.07);}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(210,170,130,0.1);}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;}
+
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:400;color:var(--text);}
+.topbar-title span{font-style:italic;color:var(--gold-dark);}
+.page{display:none;padding:28px 32px;}
+.page.active{display:block;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--gold);color:var(--white);}
+.btn-primary:hover{background:var(--gold-dark);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-light);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold-dark);}
+.btn-ghost{background:transparent;color:var(--text-light);padding:6px 10px;}
+.btn-ghost:hover{color:var(--gold-dark);background:var(--gold-pale);}
+.btn-danger{background:var(--danger);color:var(--white);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--shadow);}
+.stat-label{font-size:10px;color:var(--text-muted);letter-spacing:0.07em;margin-bottom:6px;text-transform:uppercase;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:var(--text);line-height:1;}
+.stat-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.stat-gold{color:var(--gold-dark);}
+.stat-green{color:var(--success);}
+.stat-red{color:var(--danger);}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-header{background:var(--gold-pale);padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;}
+
+/* EVENTS TABLE */
+.etable{width:100%;border-collapse:collapse;}
+.etable th{background:var(--gold-pale);padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text-light);letter-spacing:0.05em;border-bottom:1px solid var(--border);}
+.etable td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.etable tr:last-child td{border-bottom:none;}
+.etable tbody tr:hover td{background:var(--gold-pale);cursor:pointer;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.badge-morning{background:#FEF3C7;color:#92400E;}
+.badge-afternoon{background:#DBEAFE;color:#1E40AF;}
+.badge-paid{background:#DCFCE7;color:#166534;}
+.badge-pending{background:#FEE2E2;color:#991B1B;}
+.badge-partial{background:#FEF9C3;color:#713F12;}
+.badge-pkg{background:var(--gold-pale);color:var(--gold-dark);border:1px solid var(--gold-light);}
+
+/* PROGRESS */
+.progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.3s;}
+
+/* SECTION HEADER */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;}
+
+/* REMINDERS */
+.reminder-item{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.reminder-item:last-child{border-bottom:none;}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.rdot-red{background:var(--danger);}
+.rdot-orange{background:var(--warning);}
+.rdot-green{background:var(--success);}
+.reminder-text{flex:1;font-size:13px;}
+.reminder-event{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.reminder-days{font-size:12px;font-weight:600;white-space:nowrap;}
+
+/* FORM */
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:26px 30px;box-shadow:var(--shadow);max-width:820px;}
+.fsec{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--text);margin:22px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.fsec:first-of-type{margin-top:0;}
+.frow{display:grid;gap:14px;margin-bottom:12px;}
+.frow-2{grid-template-columns:1fr 1fr;}
+.frow-3{grid-template-columns:1fr 1fr 1fr;}
+.frow-1{grid-template-columns:1fr;}
+.fgroup{display:flex;flex-direction:column;gap:4px;}
+.flabel{font-size:11px;font-weight:500;color:var(--text-light);letter-spacing:0.04em;}
+.finput,.fselect,.ftextarea{padding:8px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);transition:border-color 0.15s;outline:none;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(210,170,130,0.12);}
+.ftextarea{resize:vertical;min-height:70px;}
+.event-name-preview{background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:6px;padding:9px 13px;font-size:13px;color:var(--gold-dark);font-style:italic;min-height:34px;}
+
+/* ADDONS */
+.addons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.addon-check{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.15s;font-size:12px;color:var(--text-light);user-select:none;}
+.addon-check:hover{border-color:var(--gold);color:var(--text);}
+.addon-check.selected{border-color:var(--gold);background:var(--gold-pale);color:var(--gold-dark);font-weight:500;}
+.addon-check input{display:none;}
+
+/* FINANCE BOX */
+.finance-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.finance-box{background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;padding:14px 16px;}
+.finance-box-label{font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+.finance-box-value{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--text);}
+.finance-box-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:3px;width:fit-content;box-shadow:var(--shadow);margin-bottom:18px;}
+.tab{padding:7px 16px;border-radius:5px;font-size:12px;font-weight:400;cursor:pointer;color:var(--text-light);transition:all 0.15s;}
+.tab:hover{color:var(--text);}
+.tab.active{background:var(--gold);color:var(--white);font-weight:500;}
+
+/* CHECKLIST */
+.checklist-phase{background:var(--white);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
+.phase-hdr{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.phase-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;}
+.phase-prog{font-size:11px;color:var(--text-muted);}
+.check-item{display:flex;align-items:flex-start;gap:11px;padding:10px 18px;border-bottom:1px solid var(--border);transition:background 0.1s;}
+.check-item:last-child{border-bottom:none;}
+.check-item:hover{background:var(--gold-pale);}
+.check-item.done label{text-decoration:line-through;color:var(--text-muted);}
+.check-item input[type="checkbox"]{margin-top:2px;flex-shrink:0;width:14px;height:14px;accent-color:var(--gold-dark);cursor:pointer;}
+.check-item label{font-size:13px;cursor:pointer;line-height:1.4;flex:1;}
+.owner-tag{font-size:10px;padding:2px 7px;border-radius:10px;flex-shrink:0;margin-top:2px;white-space:nowrap;}
+.owner-franci{background:#FDF4FF;color:#6B21A8;}
+.owner-kung{background:#F0FDF4;color:#166534;}
+.late-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:#FEE2E2;color:#991B1B;flex-shrink:0;margin-top:2px;}
+
+/* PHASE COLORS */
+.phase-red .phase-hdr{background:#FEE2E2;}
+.phase-orange .phase-hdr{background:#FEF3C7;}
+.phase-green .phase-hdr{background:#F0FDF4;}
+.phase-default .phase-hdr{background:var(--gold-pale);}
+
+/* TIMELINE TABLE */
+.ttable{width:100%;border-collapse:collapse;}
+.ttable th{background:var(--gold-pale);padding:9px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text-light);border-bottom:1px solid var(--border);}
+.ttable td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+.ttable tr:last-child td{border-bottom:none;}
+.ttable tr:nth-child(even) td{background:var(--gold-pale);}
+.time-cell{color:var(--gold-dark);font-weight:600;white-space:nowrap;}
+
+/* PDF CARDS */
+.pdf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.pdf-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;box-shadow:var(--shadow);transition:all 0.2s;}
+.pdf-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);}
+.pdf-icon{font-size:30px;margin-bottom:9px;}
+.pdf-card-title{font-family:'Cormorant Garamond',serif;font-size:16px;margin-bottom:5px;}
+.pdf-card-desc{font-size:11px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;}
+
+/* STATUS PILL */
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+
+/* EVENT DETAIL HEADER */
+.event-dh{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin-bottom:18px;box-shadow:var(--shadow);}
+.event-dh-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:7px;}
+.event-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);}
+.event-meta span{display:flex;align-items:center;gap:4px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:var(--gold-light);padding:11px 18px;border-radius:8px;font-size:13px;box-shadow:var(--shadow-lg);z-index:999;opacity:0;transform:translateY(8px);transition:all 0.25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(61,46,30,0.45);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:12px;padding:30px;max-width:500px;width:90%;box-shadow:var(--shadow-lg);}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:8px;}
+.modal-body{font-size:13px;color:var(--text-light);line-height:1.6;margin-bottom:22px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text-muted);}
+.empty-icon{font-size:40px;margin-bottom:14px;}
+.empty-state h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--text-light);margin-bottom:6px;}
+
+/* REPORT */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.report-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;box-shadow:var(--shadow);}
+.report-card h4{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;margin-bottom:12px;color:var(--text);}
+.report-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.report-row:last-child{border-bottom:none;}
+.report-row span:last-child{font-weight:500;color:var(--gold-dark);}
+
+@media(max-width:900px){
+  .sidebar{width:56px;}
+  .sidebar-logo-name,.nav-item span{display:none;}
+  .main{margin-left:56px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .frow-3{grid-template-columns:1fr 1fr;}
+  .pdf-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    
+    <div class="sidebar-logo-name">Casamentos<br>na Tailândia</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showPage('events')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>All Events</span>
+    </div>
+    <div class="nav-item" onclick="showPage('new-event')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span>New Event</span>
+    </div>
+    <div class="nav-label">Tools</div>
+    <div class="nav-item" onclick="showPage('reminders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Reminders</span>
+    </div>
+    <div class="nav-item" onclick="showPage('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reports</span>
+    </div>
+    <div class="nav-item" onclick="showPage('suppliers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Suppliers</span>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="topbar">
+    <div class="topbar-title">Good morning, <span>Franci</span> 🌸</div>
+    <button class="btn btn-primary" onclick="showPage('new-event')">+ New Event</button>
+  </div>
+  <div style="padding:28px 32px">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Active Events</div><div class="stat-value stat-gold" id="s-active">0</div><div class="stat-sub">this season</div></div>
+      <div class="stat-card"><div class="stat-label">Revenue (season)</div><div class="stat-value stat-green" id="s-revenue">฿0</div><div class="stat-sub">total sales</div></div>
+      <div class="stat-card"><div class="stat-label">Balance Pending</div><div class="stat-value stat-red" id="s-pending">฿0</div><div class="stat-sub">to be collected</div></div>
+      <div class="stat-card"><div class="stat-label">Needs Attention</div><div class="stat-value stat-red" id="s-urgent">0</div><div class="stat-sub">overdue tasks</div></div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title">🔔 What needs your attention today</div></div>
+      <div id="dash-reminders"><div class="empty-state" style="padding:24px"><div style="font-size:20px">✨</div><div style="font-size:13px;color:var(--text-muted);margin-top:6px">All caught up! Add your first event to get started.</div></div></div>
+    </div>
+    <div class="section-hdr"><div class="section-title">Upcoming events</div><button class="btn btn-ghost" onclick="showPage('events')">See all →</button></div>
+    <div class="card" id="dash-events"><div class="empty-state"><div class="empty-icon">🌺</div><h3>No events yet</h3><p>Create your first event to get started</p><br><button class="btn btn-primary" onclick="showPage('new-event')">Create first event</button></div></div>
+  </div>
+</div>
+
+<!-- ALL EVENTS -->
+<div class="page" id="page-events">
+  <div class="topbar">
+    <div class="topbar-title">All <span>Events</span></div>
+    <button class="btn btn-primary" onclick="showPage('new-event')">+ New Event</button>
+  </div>
+  <div style="padding:28px 32px">
+    <div class="card" id="all-events-card"><div class="empty-state"><div class="empty-icon">🌺</div><h3>No events yet</h3></div></div>
+  </div>
+</div>
+
+<!-- NEW EVENT -->
+<div class="page" id="page-new-event">
+  <div class="topbar"><div class="topbar-title">New <span>Event</span></div></div>
+  <div style="padding:28px 32px">
+    <div class="form-card">
+      <div class="fsec">Event name preview</div>
+      <div class="event-name-preview" id="name-preview">Fill in the details below…</div>
+
+      <div class="fsec">Couple & Event</div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Partner 1 — First name</label><input class="finput" id="f-n1" placeholder="e.g. Valentina" oninput="updateName()"></div>
+        <div class="fgroup"><label class="flabel">Partner 2 — First name</label><input class="finput" id="f-n2" placeholder="e.g. Rafael" oninput="updateName()"></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Partner 1 — Full name</label><input class="finput" id="f-fn1" placeholder="Full legal name"></div>
+        <div class="fgroup"><label class="flabel">Partner 2 — Full name</label><input class="finput" id="f-fn2" placeholder="Full legal name"></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Partner 1 CPF (optional)</label><input class="finput" id="f-cpf1" placeholder="000.000.000-00"></div>
+        <div class="fgroup"><label class="flabel">Partner 2 CPF (optional)</label><input class="finput" id="f-cpf2" placeholder="000.000.000-00"></div>
+      </div>
+      <div class="frow frow-3">
+        <div class="fgroup"><label class="flabel">Event date</label><input class="finput" id="f-date" type="date" oninput="updateName()"></div>
+        <div class="fgroup"><label class="flabel">Time</label><input class="finput" id="f-time" type="time"></div>
+        <div class="fgroup"><label class="flabel">Morning / Afternoon</label>
+          <select class="fselect" id="f-tod" onchange="updateName()">
+            <option value="">Select</option><option>Morning</option><option>Afternoon</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Event type</label>
+          <select class="fselect" id="f-type" onchange="updateName()">
+            <option value="">Select type</option><option>Wedding</option><option>Vow Renewal</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Date of sale</label><input class="finput" id="f-sold" type="date"></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Package</label>
+          <select class="fselect" id="f-pkg" onchange="updateName();updateFinances()">
+            <option value="">Select package</option>
+            <optgroup label="Longtail"><option>Longtail Light</option><option>Longtail Essencial</option><option>Longtail Premium</option><option>Longtail Deluxe</option></optgroup>
+            <optgroup label="Western"><option>Western Light</option><option>Western Essencial</option><option>Western Classic</option></optgroup>
+            <optgroup label="Buddhist"><option>Temple Buddhist Blessing</option><option>Beach Buddhist Blessing Essencial</option><option>Beach Buddhist Blessing Classic</option></optgroup>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Location</label>
+          <select class="fselect" id="f-loc" onchange="updateName();updateFinances()">
+            <option value="">Select location</option><option>Phi Phi</option><option>Railay</option><option>Krabi</option><option>Phuket</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">MC / Celebrant</label>
+          <select class="fselect" id="f-mc">
+            <option value="">Select</option><option>Franci</option><option>Luciana</option><option>Lucie</option><option>N/A</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Number of guests</label><input class="finput" id="f-guests" type="number" min="2" placeholder="e.g. 2"></div>
+      </div>
+
+      <div class="fsec">Contact & Hotel</div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">WhatsApp</label><input class="finput" id="f-wa" placeholder="+55 11 99999-9999"></div>
+        <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" placeholder="couple@email.com"></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Hotel name</label><input class="finput" id="f-hotel" placeholder="e.g. Aonang Princeville"></div>
+        <div class="fgroup"><label class="flabel">Recommended by</label><input class="finput" id="f-refby" placeholder="Name or agency"></div>
+      </div>
+
+      <div class="fsec">Finances</div>
+      <div class="frow frow-3">
+        <div class="fgroup"><label class="flabel">Sale price (฿)</label><input class="finput" id="f-sale" type="number" placeholder="e.g. 81000" oninput="updateFinances()"></div>
+        <div class="fgroup"><label class="flabel">Invoice / net price (฿)</label><input class="finput" id="f-invoice" type="number" placeholder="Auto-filled by package" oninput="updateFinances()"></div>
+        <div class="fgroup"><label class="flabel">Payment method</label>
+          <select class="fselect" id="f-paymethod">
+            <option value="">Select</option><option>Wise</option><option>Thai Bank</option><option>Pix</option><option>Cash</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow frow-3">
+        <div class="fgroup"><label class="flabel">Deposit (฿) — auto 30%</label><input class="finput" id="f-deposit" type="number" placeholder="Auto-calculated" oninput="updateFinances()"></div>
+        <div class="fgroup"><label class="flabel">Deposit status</label>
+          <select class="fselect" id="f-dep-status">
+            <option value="pending">Pending</option><option value="paid">Paid</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Balance (฿) — auto</label><input class="finput" id="f-balance" type="number" placeholder="Auto-calculated" readonly style="background:var(--gold-pale)"></div>
+      </div>
+      <div class="frow frow-3">
+        <div class="fgroup"><label class="flabel">Balance status</label>
+          <select class="fselect" id="f-bal-status">
+            <option value="pending">Pending</option><option value="paid">Paid</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Commission (5% if referred)</label><input class="finput" id="f-commission" type="number" placeholder="Auto if referred" readonly style="background:var(--gold-pale)"></div>
+        <div class="fgroup"><label class="flabel">Commission status</label>
+          <select class="fselect" id="f-com-status">
+            <option value="n/a">N/A</option><option value="pending">Pending</option><option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fsec">Flowers</div>
+      <div class="frow frow-3">
+        <div class="fgroup"><label class="flabel">Bouquet (catalogue # or Custom)</label><input class="finput" id="f-bouquet" placeholder="e.g. 3"></div>
+        <div class="fgroup"><label class="flabel">Head flowers (catalogue #)</label><input class="finput" id="f-head" placeholder="e.g. 1"></div>
+        <div class="fgroup"><label class="flabel">Groom's shirt color</label><input class="finput" id="f-shirt" placeholder="e.g. White"></div>
+      </div>
+      <div class="frow frow-1">
+        <div class="fgroup"><label class="flabel">Extra flower notes</label><input class="finput" id="f-flower-notes" placeholder="e.g. 2x flower necklace Thai white orchid, 6 red roses"></div>
+      </div>
+
+      <div class="fsec">Music</div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Entrance song (beach / western / beach buddhist)</label><input class="finput" id="f-s1" placeholder="Song — Artist"></div>
+        <div class="fgroup"><label class="flabel">Kiss song</label><input class="finput" id="f-s2" placeholder="Song — Artist"></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Exit / final song</label><input class="finput" id="f-s3" placeholder="Song — Artist"></div>
+        <div class="fgroup"><label class="flabel">Video song 1 (if video included)</label><input class="finput" id="f-s4" placeholder="Song — Artist"></div>
+      </div>
+      <div class="frow frow-1">
+        <div class="fgroup"><label class="flabel">Video song 2 (if video included)</label><input class="finput" id="f-s5" placeholder="Song — Artist"></div>
+      </div>
+
+      <div class="fsec">Add-on Services</div>
+      <div class="addons-grid" id="addons-grid">
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Videomaker">🎬 Videomaker</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Hair & Makeup">💄 Hair & Makeup</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Picnic">🧺 Picnic</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Making of">🎥 Making of</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Romantic Dinner">🍽️ Romantic Dinner</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Pre-wedding">📸 Pre-wedding</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Social Media">📱 Social Media</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Hair & Makeup 2x">💄 Hair & Makeup 2x</label>
+        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Extra Bouquet">💐 Extra Bouquet</label>
+      </div>
+
+      <div class="fsec">Notes</div>
+      <div class="frow frow-1">
+        <div class="fgroup"><label class="flabel">Special requests or observations</label><textarea class="ftextarea" id="f-notes" placeholder="Any special details, requests, things to remember, VIP notes…"></textarea></div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="showPage('events')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewEvent()">🌺 Create event</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAIL -->
+<div class="page" id="page-event-detail">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-ghost" onclick="showPage('events')" style="padding:5px 9px">← Back</button>
+      <div class="topbar-title" id="det-title">Event</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="showTab('tab-pdfs')">📄 Generate PDFs</button>
+      <button class="btn btn-danger" onclick="openDeleteModal()">Delete</button>
+    </div>
+  </div>
+  <div style="padding:28px 32px">
+    <div class="event-dh">
+      <div class="event-dh-name" id="det-name"></div>
+      <div class="event-meta" id="det-meta"></div>
+      <div style="margin-top:14px">
+        <div class="progress-bar"><div class="progress-fill" id="det-prog" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="det-prog-label"></div>
+      </div>
+    </div>
+
+    <!-- Finance summary -->
+    <div class="finance-grid" id="det-finance"></div>
+
+    <div class="tabs">
+      <div class="tab active" id="tab-checklist" onclick="showTab('tab-checklist')">✅ Checklist</div>
+      <div class="tab" id="tab-timeline" onclick="showTab('tab-timeline')">⏰ Timeline</div>
+      <div class="tab" id="tab-info" onclick="showTab('tab-info')">📋 Event Info</div>
+      <div class="tab" id="tab-pdfs" onclick="showTab('tab-pdfs')">📄 PDFs</div>
+    </div>
+
+    <div id="tc-checklist"></div>
+    <div id="tc-timeline" style="display:none"></div>
+    <div id="tc-info" style="display:none"></div>
+    <div id="tc-pdfs" style="display:none"></div>
+  </div>
+</div>
+
+<!-- REMINDERS -->
+<div class="page" id="page-reminders">
+  <div class="topbar"><div class="topbar-title">Reminders & <span>Follow-ups</span></div></div>
+  <div style="padding:28px 32px"><div id="reminders-list"></div></div>
+</div>
+
+<!-- REPORTS -->
+<div class="page" id="page-reports">
+  <div class="topbar"><div class="topbar-title">Business <span>Reports</span></div></div>
+  <div style="padding:28px 32px" id="reports-content"></div>
+</div>
+
+<!-- SUPPLIERS -->
+<div class="page" id="page-suppliers">
+  <div class="topbar"><div class="topbar-title">Supplier <span>Contacts</span></div></div>
+  <div style="padding:28px 32px">
+    <div class="form-card">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px">Keep your regular supplier contacts here for quick access.</p>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Florist</label><input class="finput" id="sup-florist" placeholder="Name / shop"></div>
+        <div class="fgroup"><label class="flabel">Florist WhatsApp</label><input class="finput" id="sup-florist-wa" placeholder="+66 ..."></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Photographer (main)</label><input class="finput" id="sup-photo" placeholder="Name"></div>
+        <div class="fgroup"><label class="flabel">Photographer WhatsApp</label><input class="finput" id="sup-photo-wa" placeholder="+66 ..."></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Videomaker</label><input class="finput" id="sup-video" placeholder="Name"></div>
+        <div class="fgroup"><label class="flabel">Videomaker WhatsApp</label><input class="finput" id="sup-video-wa" placeholder="+66 ..."></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Taxi / Driver</label><input class="finput" id="sup-taxi" placeholder="Name"></div>
+        <div class="fgroup"><label class="flabel">Driver WhatsApp</label><input class="finput" id="sup-taxi-wa" placeholder="+66 ..."></div>
+      </div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Kung's WhatsApp</label><input class="finput" id="sup-kung" placeholder="+66 ..."></div>
+        <div class="fgroup"><label class="flabel">Boat company (Phi Phi)</label><input class="finput" id="sup-boat" placeholder="Contact"></div>
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-primary" onclick="saveSuppliers()">Save contacts</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title">Delete this event?</div>
+    <div class="modal-body">This will permanently remove the event and all its data. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete event</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// -- NET PRICES --
+const NET_PRICES = {
+  'Longtail Light':    { Railay:37300, 'Phi Phi':35100, default:37300 },
+  'Longtail Essencial':{ Railay:54950, 'Phi Phi':57650, default:54950 },
+  'Longtail Premium':  { Railay:79350, 'Phi Phi':83850, default:79350 },
+  'Longtail Deluxe':   { Railay:149150, default:149150 },
+  'Western Light':     { Railay:27000, 'Phi Phi':32000, default:27000 },
+};
+
+// -- DATA --
+let events = JSON.parse(localStorage.getItem('fk_events_v2') || '[]');
+let suppliers = JSON.parse(localStorage.getItem('fk_suppliers') || '{}');
+let currentId = null;
+
+function save() {
+  localStorage.setItem('fk_events_v2', JSON.stringify(events));
+}
+function saveToSheets(ev, isNew) {
+  const action = isNew ? 'saveEvent' : 'updateEvent';
+  sheetsSync({action: action, event: flattenEv(ev)});
+}
+function deleteFromSheets(id) {
+  sheetsSync({action: 'deleteEvent', id: id});
+}
+function saveSuppliers() {
+  const s = {};
+  ['florist','florist-wa','photo','photo-wa','video','video-wa','taxi','taxi-wa','kung','boat'].forEach(k => {
+    const el = document.getElementById('sup-'+k);
+    if(el) s[k] = el.value;
+  });
+  localStorage.setItem('fk_suppliers', JSON.stringify(s));
+  showToast('Contacts saved ✓');
+}
+
+
+
+// -- CHECKLIST BUILDER --
+function buildChecklist(pkg, loc, addons) {
+  const isBeach = loc === 'Railay' || loc === 'Phi Phi' || loc === 'Krabi';
+  const isRailay = loc === 'Railay';
+  const hasVideo = addons.includes('Videomaker');
+  const hasCeremony = !pkg.includes('Light');
+  const hasEntrance = pkg.includes('Western') || pkg.includes('Buddhist') || isBeach;
+
+  return [
+    { phase:'📋 Upon booking', color:'default', items:[
+      {t:'Send reservation form to couple',o:'franci'},
+      {t:'Send contract for e-signature',o:'franci'},
+      {t:'Send payment link for deposit (30%)',o:'franci'},
+      {t:'Send wedding form (30-day questionnaire)',o:'franci'},
+      {t:'Add event to Google Calendar with all details',o:'franci'},
+      {t:'Add Kung, photographer and suppliers to Google Calendar event',o:'franci'},
+      {t:'Season start: bulk order clipboards, wine glasses, sand bottles, gifts (Lazada)',o:'franci'},
+    ]},
+    { phase:'📅 7 days after sending contract', color:'default', items:[
+      {t:'Follow up if contract not signed yet',o:'franci'},
+      {t:'Follow up if deposit payment not received yet',o:'franci'},
+    ]},
+    { phase:'📅 After deposit payment received', color:'default', items:[
+      {t:'Create Google Drive folder for photographer and share link with couple',o:'franci'},
+      {t:'Record deposit payment in spreadsheet',o:'kung'},
+    ]},
+    { phase:'📅 30 days before', color:'default', items:[
+      {t:'Check couple completed the wedding form',o:'franci'},
+      {t:'Send event summary to Kung as soon as form is filled',o:'franci'},
+      {t:'Confirm flower choices and share reference images with Kung',o:'franci'},
+    ]},
+    { phase:'📅 2-3 weeks before', color:'default', items:[
+      {t: isRailay ? 'Book boat - Railay (Kung handles)' : 'Book boat - '+loc+' (Franci handles)', o: isRailay ? 'kung':'franci'},
+      {t:'Send event instructions to couple (video call or written)',o:'franci'},
+      {t:'Include Google Drive link in instructions (photos available 60 days)',o:'franci'},
+      {t:'Send payment link for remaining balance',o:'franci'},
+      {t:'Order flowers',o:'kung'},
+      ...(hasVideo ? [{t:'Confirm song choices with couple for official video (2 songs)',o:'franci'}] : []),
+      ...(hasVideo ? [{t:'Send song list to videomaker',o:'franci'}] : []),
+    ]},
+    { phase:'📅 1 week before', color:'default', items:[
+      {t:'Confirm couple\'s hotel name',o:'franci'},
+      {t:'Book taxi / transfer',o:'franci'},
+      {t:'Confirm photographer with full event details',o:'franci'},
+      ...(hasVideo ? [{t:'Confirm videomaker with full event details',o:'franci'}] : []),
+      ...(addons.includes('Social Media') ? [{t:'Confirm social media person with full event details',o:'franci'}] : []),
+      {t:'Confirm boat (guest count, time, location)',o: isRailay ? 'kung':'franci'},
+      {t:'Brief Kung with complete event details',o:'franci'},
+      {t:'Generate and send Kung\'s PDF brief via WhatsApp',o:'franci'},
+      ...(addons.includes('Picnic') ? [{t:'Confirm picnic items with Kung (dietary restrictions, drinks)',o:'franci'}] : []),
+      ...(addons.includes('Making of') ? [{t:'Confirm making of logistics with photographer/videomaker',o:'franci'}] : []),
+    ]},
+    { phase:'📅 Day before', color:'default', items:[
+      {t:'Confirm boat reservation',o: isRailay ? 'kung':'franci'},
+      {t:'Confirm taxi / transfer',o:'franci'},
+      {t:'Check sparkling wine and glasses',o:'kung'},
+      {t:'Check speaker and charge battery',o:'franci'},
+      {t:'Confirm flowers with Kung',o:'franci'},
+      ...(hasCeremony ? [{t:'Check ceremony kit: sand shell, 2 glasses, sand, ring bearer shell, script, certificate',o:'franci'}] : []),
+      ...(hasCeremony ? [{t:'Check gift bag: Lucie gift + small sand jar + dreamcatcher with couple\'s names',o:'franci'}] : []),
+      ...(addons.includes('Picnic') ? [{t:'Confirm picnic (snacks + drinks) with Kung',o:'kung'}] : []),
+      ...(addons.includes('Hair & Makeup') || addons.includes('Hair & Makeup 2x') ? [{t:'Confirm hair & makeup artist - hotel name and time',o:'franci'}] : []),
+    ]},
+    { phase:'✅ After the event', color:'default', items:[
+      {t:'Check photographer uploaded photos to Google Drive',o:'franci'},
+      {t:'Share Drive folder link with couple',o:'franci'},
+      {t:'Create invoice for accountant',o:'kung'},
+      {t:'Record final payment in spreadsheet',o:'kung'},
+      {t:'Send thank-you message to couple',o:'franci'},
+      {t:'Note couple\'s wedding anniversary date for future message',o:'franci'},
+      {t:'Post on social media if couple authorized image use',o:'franci'},
+      ...(hasVideo ? [{t:'Confirm Reels delivered within 48h',o:'franci'}] : []),
+      ...(hasVideo ? [{t:'Confirm official video delivered on agreed date',o:'franci'}] : []),
+    ]},
+  ].map(p => ({ ...p, items: p.items.map(i => ({...i, done:false})) }));
+}
+
+// -- TIMELINE BUILDER --
+function buildTimeline(pkg, loc, tod, addons) {
+  const pm = tod === 'Afternoon';
+  const hasCeremony = !pkg.includes('Light');
+  const hasPicknic = addons.includes('Picnic');
+  const t = pm
+    ? ['14:45','15:00','15:00','15:30','16:00','16:45','17:15','17:55','18:25','18:40']
+    : ['06:45','07:00','07:00','07:30','08:00','08:45','09:15','09:55','10:25','10:40'];
+  const rows = [
+    {time:t[0], step:'Taxi picks up couple from hotel', dur:'~15 min', who:'Taxi'},
+    {time:t[1], step:'Meet at the pier - Kung + photographer ready', dur:'-', who:'Kung + Photographer'},
+    {time:t[2], step:'Boat departs to ceremony spot', dur:'~30 min', who:'Captain'},
+  ];
+  if(hasCeremony) {
+    rows.push({time:t[3], step:'CEREMONY - '+pkg+' (officiated by MC)', dur:'~30 min', who:'MC'});
+    rows.push({time:t[4], step:'Photoshoot on boat + drone', dur:'~45 min', who:'Photographer'});
+    rows.push({time:t[5], step:'Sail to Poda Island / next location', dur:'~30 min', who:'Captain'});
+    rows.push({time:t[6], step:'Beach photoshoot + drone', dur:'~40 min', who:'Photographer'});
+    if(hasPicknic) {
+      rows.push({time:t[7], step:'Picnic on the beach', dur:'~30 min', who:'Kung'});
+      rows.push({time:t[8], step:'Toast with sparkling wine on boat', dur:'~15 min', who:'Everyone'});
+      rows.push({time:t[9], step: pm ? 'Sunset on boat, then return to hotel':'Return to hotel', dur:'~30 min', who:'Taxi'});
+    } else {
+      rows.push({time:t[7], step:'Toast with sparkling wine on boat', dur:'~15 min', who:'Everyone'});
+      rows.push({time:t[8], step: pm ? 'Sunset on boat, then return to hotel':'Return to hotel', dur:'~30 min', who:'Taxi'});
+    }
+  } else {
+    rows.push({time:t[3], step:'Photoshoot on boat + drone (vow exchange - no formal ceremony)', dur:'~45 min', who:'Photographer'});
+    rows.push({time:t[4], step:'Sail to Poda Island / next location', dur:'~30 min', who:'Captain'});
+    rows.push({time:t[5], step:'Beach photoshoot + drone', dur:'~40 min', who:'Photographer'});
+    rows.push({time:t[6], step:'Toast with sparkling wine on boat', dur:'~15 min', who:'Everyone'});
+    rows.push({time:t[7], step: pm ? 'Sunset on boat, then return to hotel':'Return to hotel', dur:'~30 min', who:'Taxi'});
+  }
+  return rows;
+}
+
+// -- SEASON --
+function getSeason(dateStr) {
+  if(!dateStr) return '-';
+  const d = new Date(dateStr);
+  const m = d.getMonth()+1; // 1-12
+  const y = d.getFullYear();
+  if(m >= 10) return y+'/'+(y+1).toString().slice(2);
+  if(m <= 4) return (y-1)+'/'+y.toString().slice(2);
+  return 'Off-season '+y;
+}
+
+// -- NAME BUILDER --
+function updateName() {
+  const d = document.getElementById('f-date').value;
+  const n1 = document.getElementById('f-n1').value;
+  const n2 = document.getElementById('f-n2').value;
+  const type = document.getElementById('f-type').value;
+  const pkg = document.getElementById('f-pkg').value;
+  const loc = document.getElementById('f-loc').value;
+  const tod = document.getElementById('f-tod').value;
+  let s = '';
+  if(d){ const p=d.split('-'); s+=p[2]+'/'+p[1]+'/'+p[0].slice(2)+' - '; }
+  if(type) s+=type+' ';
+  if(n1) s+=n1;
+  if(n1&&n2) s+=' + ';
+  if(n2) s+=n2;
+  if(pkg) s+=' - '+pkg;
+  if(loc) s+=' - '+loc;
+  if(tod) s+=' - '+tod;
+  document.getElementById('name-preview').textContent = s || 'Fill in the details below…';
+}
+
+function updateFinances() {
+  const pkg = document.getElementById('f-pkg').value;
+  const loc = document.getElementById('f-loc').value;
+  const saleEl = document.getElementById('f-sale');
+  const invoiceEl = document.getElementById('f-invoice');
+  const depositEl = document.getElementById('f-deposit');
+  const balanceEl = document.getElementById('f-balance');
+  const commEl = document.getElementById('f-commission');
+  const refby = document.getElementById('f-refby').value.trim();
+
+  // Auto-fill invoice price
+  if(pkg && NET_PRICES[pkg]) {
+    const prices = NET_PRICES[pkg];
+    const netPrice = prices[loc] || prices.default || '';
+    if(netPrice && !invoiceEl.value) invoiceEl.value = netPrice;
+  }
+
+  const sale = parseFloat(saleEl.value) || 0;
+  const deposit = parseFloat(depositEl.value);
+  if(sale && isNaN(deposit)) depositEl.value = Math.round(sale * 0.30);
+  const dep = parseFloat(depositEl.value) || 0;
+  balanceEl.value = sale ? Math.max(0, sale - dep) : '';
+
+  // Commission
+  if(refby && sale) {
+    commEl.value = Math.round(sale * 0.05);
+    document.getElementById('f-com-status').value = 'pending';
+  } else {
+    commEl.value = '';
+    document.getElementById('f-com-status').value = 'n/a';
+  }
+}
+
+function toggleAddon(el) {
+  el.classList.toggle('selected');
+  el.querySelector('input').checked = el.classList.contains('selected');
+}
+
+// -- SAVE EVENT --
+function saveNewEvent() {
+  const n1 = document.getElementById('f-n1').value.trim();
+  const n2 = document.getElementById('f-n2').value.trim();
+  const date = document.getElementById('f-date').value;
+  const pkg = document.getElementById('f-pkg').value;
+  const loc = document.getElementById('f-loc').value;
+  if(!n1||!n2||!date||!pkg||!loc){ showToast('Please fill in names, date, package and location'); return; }
+
+  const d = date.split('-');
+  const dateFmt = d[2]+'/'+d[1]+'/'+d[0].slice(2);
+  const tod = document.getElementById('f-tod').value||'Morning';
+  const type = document.getElementById('f-type').value||'Wedding';
+  const eventName = `${dateFmt} - ${type} ${n1} + ${n2} - ${pkg} - ${loc} - ${tod}`;
+  const addons = Array.from(document.querySelectorAll('.addon-check.selected')).map(el=>el.querySelector('input').value);
+  const checklist = buildChecklist(pkg, loc, addons);
+  const sale = parseFloat(document.getElementById('f-sale').value)||0;
+  const invoice = parseFloat(document.getElementById('f-invoice').value)||0;
+  const deposit = parseFloat(document.getElementById('f-deposit').value)||0;
+  const balance = parseFloat(document.getElementById('f-balance').value)||0;
+  const commission = parseFloat(document.getElementById('f-commission').value)||0;
+
+  const ev = {
+    id: Date.now().toString(),
+    name:eventName, date, pkg, loc, tod, type,
+    name1:n1, name2:n2,
+    fullname1:document.getElementById('f-fn1').value,
+    fullname2:document.getElementById('f-fn2').value,
+    cpf1:document.getElementById('f-cpf1').value,
+    cpf2:document.getElementById('f-cpf2').value,
+    whatsapp:document.getElementById('f-wa').value,
+    email:document.getElementById('f-email').value,
+    hotel:document.getElementById('f-hotel').value,
+    refby:document.getElementById('f-refby').value,
+    mc:document.getElementById('f-mc').value,
+    guests:document.getElementById('f-guests').value,
+    time:document.getElementById('f-time').value,
+    soldOn:document.getElementById('f-sold').value,
+    paymethod:document.getElementById('f-paymethod').value,
+    sale, invoice, deposit, balance, commission,
+    depStatus:document.getElementById('f-dep-status').value,
+    balStatus:document.getElementById('f-bal-status').value,
+    comStatus:document.getElementById('f-com-status').value,
+    bouquet:document.getElementById('f-bouquet').value,
+    head:document.getElementById('f-head').value,
+    shirt:document.getElementById('f-shirt').value,
+    flowerNotes:document.getElementById('f-flower-notes').value,
+    s1:document.getElementById('f-s1').value,
+    s2:document.getElementById('f-s2').value,
+    s3:document.getElementById('f-s3').value,
+    s4:document.getElementById('f-s4').value,
+    s5:document.getElementById('f-s5').value,
+    notes:document.getElementById('f-notes').value,
+    addons, checklist,
+    createdAt:new Date().toISOString(),
+    season:getSeason(date),
+  };
+  events.push(ev);
+  save();
+  saveToSheets(ev, true);
+  showToast('🌺 Event created!');
+  openDetail(ev.id);
+}
+
+function resetForm() {
+  document.querySelectorAll('.finput,.fselect,.ftextarea').forEach(el=>{
+    if(el.id==='f-dep-status'||el.id==='f-bal-status') el.value='pending';
+    else if(el.id==='f-com-status') el.value='n/a';
+    else el.value='';
+  });
+  document.querySelectorAll('.addon-check').forEach(el=>{el.classList.remove('selected');el.querySelector('input').checked=false;});
+  document.getElementById('name-preview').textContent='Fill in the details below…';
+}
+
+// -- OPEN DETAIL --
+function openDetail(id) {
+  currentId = id;
+  const ev = events.find(e=>e.id===id);
+  if(!ev) return;
+  document.getElementById('det-title').textContent = ev.name1+' + '+ev.name2;
+  document.getElementById('det-name').textContent = ev.name;
+  document.getElementById('det-meta').innerHTML = `
+    <span>📅 ${fmtDate(ev.date)}</span>
+    <span>⏰ ${ev.time||'-'}</span>
+    <span>📍 ${ev.loc}</span>
+    <span>🏨 ${ev.hotel||'-'}</span>
+    <span>👥 ${ev.guests||'-'} guests</span>
+    <span>🎤 ${ev.mc||'-'}</span>
+    <span>🗓 Season ${ev.season||'-'}</span>
+    ${ev.addons.length?'<span>✨ '+ev.addons.join(' · ')+'</span>':''}
+  `;
+  updateProgress(ev);
+  renderFinance(ev);
+  renderChecklist(ev);
+  renderTimeline(ev);
+  renderInfo(ev);
+  renderPDFs(ev);
+  showPage('event-detail');
+  showTab('tab-checklist');
+}
+
+function updateProgress(ev) {
+  const all = ev.checklist.flatMap(p=>p.items);
+  const done = all.filter(i=>i.done).length;
+  const pct = all.length ? Math.round(done/all.length*100) : 0;
+  document.getElementById('det-prog').style.width = pct+'%';
+  document.getElementById('det-prog-label').textContent = `${done} of ${all.length} tasks completed (${pct}%)`;
+}
+
+function renderFinance(ev) {
+  const profit = ev.sale - ev.invoice - ev.commission;
+  document.getElementById('det-finance').innerHTML = `
+    <div class="finance-box"><div class="finance-box-label">Sale price</div><div class="finance-box-value">฿${fmtNum(ev.sale)}</div><div class="finance-box-sub">${ev.paymethod||'-'}</div></div>
+    <div class="finance-box"><div class="finance-box-label">Deposit</div><div class="finance-box-value">฿${fmtNum(ev.deposit)}</div><div class="finance-box-sub"><span class="badge ${ev.depStatus==='paid'?'badge-paid':'badge-pending'}">${ev.depStatus==='paid'?'Paid':'Pending'}</span></div></div>
+    <div class="finance-box"><div class="finance-box-label">Balance</div><div class="finance-box-value">฿${fmtNum(ev.balance)}</div><div class="finance-box-sub"><span class="badge ${ev.balStatus==='paid'?'badge-paid':'badge-pending'}">${ev.balStatus==='paid'?'Paid':'Pending'}</span></div></div>
+    <div class="finance-box"><div class="finance-box-label">Invoice / net price</div><div class="finance-box-value">฿${fmtNum(ev.invoice)}</div><div class="finance-box-sub">for accountant</div></div>
+    <div class="finance-box"><div class="finance-box-label">Commission (5%)</div><div class="finance-box-value">฿${fmtNum(ev.commission)}</div><div class="finance-box-sub">${ev.refby||'-'} · <span class="badge ${ev.comStatus==='paid'?'badge-paid':ev.comStatus==='pending'?'badge-pending':'badge-partial'}">${ev.comStatus}</span></div></div>
+    <div class="finance-box" style="background:var(--gold-pale);border-color:var(--gold)"><div class="finance-box-label">Estimated profit</div><div class="finance-box-value" style="color:var(--gold-dark)">฿${fmtNum(profit>0?profit:0)}</div><div class="finance-box-sub">sale − invoice − commission</div></div>
+  `;
+}
+
+function renderChecklist(ev) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const eventDate = new Date(ev.date);
+  const daysToEvent = Math.ceil((eventDate-now)/86400000);
+  const container = document.getElementById('tc-checklist');
+  container.innerHTML = ev.checklist.map((phase,pi) => {
+    const pDone = phase.items.filter(i=>i.done).length;
+    const pTotal = phase.items.length;
+    const phaseColor = daysToEvent <= 7 && pDone < pTotal ? 'phase-red' : daysToEvent <= 14 && pDone < pTotal ? 'phase-orange' : 'phase-default';
+    return `<div class="checklist-phase ${phaseColor}">
+      <div class="phase-hdr">
+        <div class="phase-title">${phase.phase}</div>
+        <div class="phase-prog">${pDone}/${pTotal} done</div>
+      </div>
+      ${phase.items.map((item,ii)=>`
+        <div class="check-item ${item.done?'done':''}" id="ci-${pi}-${ii}">
+          <input type="checkbox" ${item.done?'checked':''} onchange="toggleCheck(${pi},${ii})">
+          <label onclick="toggleCheck(${pi},${ii})">${item.t}</label>
+          <span class="owner-tag ${item.o==='franci'?'owner-franci':'owner-kung'}">${item.o==='franci'?'🌸 Franci':'🤝 Kung'}</span>
+          ${!item.done && daysToEvent<=7?'<span class="late-tag">⚠️ Urgent</span>':''}
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleCheck(pi,ii) {
+  const ev = events.find(e=>e.id===currentId);
+  if(!ev) return;
+  ev.checklist[pi].items[ii].done = !ev.checklist[pi].items[ii].done;
+  save();
+  saveToSheets(ev, false);
+  renderChecklist(ev);
+  updateProgress(ev);
+}
+
+function renderTimeline(ev) {
+  const rows = buildTimeline(ev.pkg, ev.loc, ev.tod, ev.addons);
+  document.getElementById('tc-timeline').innerHTML = `
+    <div class="card">
+      <table class="ttable">
+        <thead><tr><th>Time</th><th>Activity</th><th>Duration</th><th>Responsible</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td class="time-cell">${r.time}</td><td>${r.step}</td><td style="color:var(--text-muted);white-space:nowrap">${r.dur}</td><td style="font-size:12px;color:var(--text-light)">${r.who}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:8px">${ev.tod==='Afternoon'?'Afternoon event - pickup at 14:45':'Morning event - pickup at 06:45'}. Adjust times as needed.</p>
+  `;
+}
+
+function renderInfo(ev) {
+  const fields = [
+    ['Couple',ev.name1+' + '+ev.name2],
+    ['Full names',ev.fullname1+' / '+ev.fullname2],
+    ['CPF 1',ev.cpf1],['CPF 2',ev.cpf2],
+    ['Date',fmtDate(ev.date)],['Date of sale',fmtDate(ev.soldOn)],
+    ['Time',ev.time],['Location',ev.loc],['Package',ev.pkg],
+    ['MC / Celebrant',ev.mc],['Guests',ev.guests],['Hotel',ev.hotel],
+    ['WhatsApp',ev.whatsapp],['Email',ev.email],
+    ['Recommended by',ev.refby],['Season',ev.season],
+    ['Bouquet',ev.bouquet],['Head flowers',ev.head],
+    ['Groom shirt',ev.shirt],['Flower notes',ev.flowerNotes],
+    ['Entrance song',ev.s1],['Kiss song',ev.s2],['Exit song',ev.s3],
+    ['Video song 1',ev.s4],['Video song 2',ev.s5],
+    ['Add-ons',ev.addons.join(', ')||'None'],
+    ['Notes',ev.notes],
+  ].filter(([,v])=>v);
+  document.getElementById('tc-info').innerHTML = `<div class="card"><table class="etable"><tbody>${fields.map(([k,v],i)=>`<tr><td style="font-weight:500;color:var(--text-light);width:180px;background:${i%2===0?'var(--gold-pale)':'white'}">${k}</td><td style="background:${i%2===0?'var(--gold-pale)':'white'}">${v}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function renderPDFs(ev) {
+  document.getElementById('tc-pdfs').innerHTML = `
+    <div class="pdf-grid">
+      <div class="pdf-card"><div class="pdf-icon">🤝</div><div class="pdf-card-title">Kung's Brief</div><div class="pdf-card-desc">Event info, flowers, her tasks - ready to send via WhatsApp</div><button class="btn btn-primary" style="width:100%" onclick="pdfKung()">Generate PDF</button></div>
+      <div class="pdf-card"><div class="pdf-icon">🌸</div><div class="pdf-card-title">Franci's Runsheet</div><div class="pdf-card-desc">Full event overview to take on the wedding day</div><button class="btn btn-primary" style="width:100%" onclick="pdfFranci()">Generate PDF</button></div>
+      <div class="pdf-card"><div class="pdf-icon">🎬</div><div class="pdf-card-title">Videomaker Brief</div><div class="pdf-card-desc">Songs, timing, deliverables for the video team</div><button class="btn btn-primary" style="width:100%;${!ev.addons.includes('Videomaker')?'opacity:0.5':''}" onclick="pdfVideo()">Generate PDF</button></div>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:14px">PDFs open in a new tab ready to print, save or share via WhatsApp.</p>
+  `;
+}
+
+// -- PDF GENERATORS --
+function pdfOpen(title, html) {
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>body{font-family:Georgia,serif;max-width:700px;margin:36px auto;color:#3D2E1E;line-height:1.5}h1{color:#D2AA82;font-size:22px;margin-bottom:4px}h2{font-size:13px;color:#8A7060;font-weight:normal;margin-bottom:22px}h3{font-size:14px;color:#D2AA82;border-bottom:1px solid #E8D9C5;padding-bottom:5px;margin:20px 0 10px;background:#FAF7F3;padding:7px 10px}table{width:100%;border-collapse:collapse;margin-bottom:14px}td,th{padding:8px 10px;font-size:13px;border-bottom:1px solid #F0E8DC;text-align:left}th{background:#F7F0E6;font-weight:600;color:#8A7060}td:first-child{color:#8A7060;font-weight:500;width:140px}.task{padding:8px 0;font-size:13px;border-bottom:1px solid #F0E8DC;display:flex;gap:10px}.cb{font-size:15px;flex-shrink:0}.foot{margin-top:30px;font-size:10px;color:#B5A090;text-align:center}@media print{body{margin:16px}}</style></head><body>${html}<div class="foot">Casamentos Franci Kohler · Generated ${new Date().toLocaleDateString('pt-BR')}</div></body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),400);
+}
+
+function pdfKung() {
+  const ev = events.find(e=>e.id===currentId); if(!ev) return;
+  const kungTasks = ev.checklist.flatMap(p=>p.items.filter(i=>i.o==='kung'));
+  pdfOpen('Kung Brief - '+ev.name, `
+    <h1>🤝 Kung's Event Brief</h1><h2>${ev.name}</h2>
+    <h3>Event Details</h3>
+    <table><tr><td>Couple</td><td>${ev.name1} + ${ev.name2}</td></tr><tr><td>Date</td><td>${fmtDate(ev.date)} - ${ev.tod}</td></tr><tr><td>Time</td><td>${ev.time||'-'}</td></tr><tr><td>Location</td><td>${ev.loc}</td></tr><tr><td>Package</td><td>${ev.pkg}</td></tr><tr><td>Guests</td><td>${ev.guests||'-'}</td></tr><tr><td>Hotel</td><td>${ev.hotel||'-'}</td></tr><tr><td>WhatsApp</td><td>${ev.whatsapp||'-'}</td></tr><tr><td>MC</td><td>${ev.mc||'-'}</td></tr></table>
+    <h3>Flowers</h3>
+    <table><tr><td>Bouquet</td><td>${ev.bouquet||'-'}</td></tr><tr><td>Head flowers</td><td>${ev.head||'-'}</td></tr><tr><td>Groom's shirt</td><td>${ev.shirt||'-'}</td></tr><tr><td>Extras</td><td>${ev.flowerNotes||'-'}</td></tr></table>
+    ${ev.addons.length?'<h3>Add-ons included</h3><p style="font-size:13px">'+ev.addons.join(' · ')+'</p>':''}
+    <h3>Your Tasks</h3>${kungTasks.map(t=>`<div class="task"><span class="cb">☐</span><span>${t.t}</span></div>`).join('')}
+    ${ev.notes?'<h3>Notes</h3><p style="font-size:13px">'+ev.notes+'</p>':''}
+  `);
+}
+
+function pdfFranci() {
+  const ev = events.find(e=>e.id===currentId); if(!ev) return;
+  const timeline = buildTimeline(ev.pkg, ev.loc, ev.tod, ev.addons);
+  pdfOpen('Runsheet - '+ev.name, `
+    <h1>🌸 Wedding Day Runsheet</h1><h2>${ev.name}</h2>
+    <h3>Event Info</h3>
+    <table><tr><td>Couple</td><td>${ev.name1} + ${ev.name2}</td><td>Hotel</td><td>${ev.hotel||'-'}</td></tr><tr><td>Date</td><td>${fmtDate(ev.date)}</td><td>Guests</td><td>${ev.guests||'-'}</td></tr><tr><td>Time</td><td>${ev.time||'-'} (${ev.tod})</td><td>WhatsApp</td><td>${ev.whatsapp||'-'}</td></tr><tr><td>Location</td><td>${ev.loc}</td><td>MC</td><td>${ev.mc||'-'}</td></tr></table>
+    <h3>Flowers</h3>
+    <table><tr><td>Bouquet</td><td>${ev.bouquet||'-'}</td><td>Head flowers</td><td>${ev.head||'-'}</td></tr><tr><td>Groom shirt</td><td>${ev.shirt||'-'}</td><td>Extras</td><td>${ev.flowerNotes||'-'}</td></tr></table>
+    <h3>Music</h3>
+    <table><tr><td>Entrance</td><td>${ev.s1||'-'}</td></tr><tr><td>Kiss</td><td>${ev.s2||'-'}</td></tr><tr><td>Exit</td><td>${ev.s3||'-'}</td></tr>${ev.s4?'<tr><td>Video 1</td><td>'+ev.s4+'</td></tr>':''}${ev.s5?'<tr><td>Video 2</td><td>'+ev.s5+'</td></tr>':''}</table>
+    <h3>Day Timeline</h3>
+    <table><tr><th>Time</th><th>Activity</th><th>Duration</th><th>Who</th></tr>${timeline.map(r=>`<tr><td style="color:#D2AA82;font-weight:600">${r.time}</td><td>${r.step}</td><td>${r.dur}</td><td>${r.who}</td></tr>`).join('')}</table>
+    ${ev.addons.length?'<h3>Add-ons</h3><p style="font-size:13px">'+ev.addons.join(' · ')+'</p>':''}
+    ${ev.notes?'<h3>Notes</h3><p style="font-size:13px">'+ev.notes+'</p>':''}
+  `);
+}
+
+function pdfVideo() {
+  const ev = events.find(e=>e.id===currentId); if(!ev) return;
+  if(!ev.addons.includes('Videomaker')){ showToast('Videomaker not included in this package'); return; }
+  pdfOpen('Videomaker Brief - '+ev.name, `
+    <h1>🎬 Videomaker Brief</h1><h2>${ev.name}</h2>
+    <h3>Event Details</h3>
+    <table><tr><td>Couple</td><td>${ev.name1} + ${ev.name2}</td></tr><tr><td>Date</td><td>${fmtDate(ev.date)} - ${ev.tod}</td></tr><tr><td>Time</td><td>${ev.time||'-'}</td></tr><tr><td>Location</td><td>${ev.loc}</td></tr><tr><td>Hotel</td><td>${ev.hotel||'-'}</td></tr></table>
+    <h3>Music for the video</h3>
+    <table><tr><td>Video song 1</td><td>${ev.s4||'- to be confirmed'}</td></tr><tr><td>Video song 2</td><td>${ev.s5||'- to be confirmed'}</td></tr><tr><td>Kiss song</td><td>${ev.s2||'-'}</td></tr></table>
+    <h3>Deliverables</h3>
+    <table><tr><td>Reels (2x)</td><td>Deliver within 48h after event</td></tr><tr><td>Official video</td><td>Confirm deadline with Franci</td></tr><tr><td>Upload to</td><td>Google Drive folder (link shared by Franci)</td></tr></table>
+    ${ev.notes?'<h3>Notes</h3><p style="font-size:13px">'+ev.notes+'</p>':''}
+  `);
+}
+
+// -- DASHBOARD --
+function renderDashboard() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const in7 = new Date(now.getTime()+7*86400000);
+  const totalRevenue = events.reduce((s,e)=>s+(e.sale||0),0);
+  const totalPending = events.reduce((s,e)=>e.balStatus!=='paid'?s+(e.balance||0):s,0);
+  const urgent = buildReminders().filter(r=>r.days<=3).length;
+  document.getElementById('s-active').textContent = events.length;
+  document.getElementById('s-revenue').textContent = '฿'+fmtNum(totalRevenue);
+  document.getElementById('s-pending').textContent = '฿'+fmtNum(totalPending);
+  document.getElementById('s-urgent').textContent = urgent;
+
+  const reminders = buildReminders().slice(0,6);
+  const remDiv = document.getElementById('dash-reminders');
+  remDiv.innerHTML = reminders.length ? reminders.map(r=>`
+    <div class="reminder-item">
+      <div class="rdot ${r.days<=3?'rdot-red':r.days<=7?'rdot-orange':'rdot-green'}"></div>
+      <div style="flex:1"><div class="reminder-text">${r.text}</div><div class="reminder-event">${r.event}</div></div>
+      <div class="reminder-days" style="color:${r.days<=3?'var(--danger)':r.days<=7?'var(--warning)':'var(--success)'}">${r.days}d</div>
+    </div>
+  `).join('') : '<div class="empty-state" style="padding:24px"><div style="font-size:20px">✨</div><div style="font-size:13px;color:var(--text-muted);margin-top:6px">All caught up!</div></div>';
+
+  const sorted = [...events].sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,6);
+  const evDiv = document.getElementById('dash-events');
+  if(!sorted.length){ evDiv.innerHTML='<div class="empty-state"><div class="empty-icon">🌺</div><h3>No events yet</h3><p>Create your first event to get started</p><br><button class="btn btn-primary" onclick="showPage(\'new-event\')">Create first event</button></div>'; return; }
+  evDiv.innerHTML = `<table class="etable"><thead><tr><th>Couple</th><th>Date</th><th>Package</th><th>Location</th><th>Sale</th><th>Balance</th><th>Progress</th></tr></thead><tbody>${sorted.map(ev=>{
+    const all=ev.checklist.flatMap(p=>p.items); const done=all.filter(i=>i.done).length; const pct=all.length?Math.round(done/all.length*100):0;
+    return `<tr onclick="openDetail('${ev.id}')"><td><strong>${ev.name1} + ${ev.name2}</strong></td><td>${fmtDate(ev.date)}</td><td><span class="badge badge-pkg">${ev.pkg}</span></td><td>${ev.loc} · <span class="badge ${ev.tod==='Morning'?'badge-morning':'badge-afternoon'}">${ev.tod}</span></td><td>฿${fmtNum(ev.sale)}</td><td><span class="badge ${ev.balStatus==='paid'?'badge-paid':'badge-pending'}">฿${fmtNum(ev.balance)}</span></td><td><div style="display:flex;align-items:center;gap:6px"><div class="progress-bar" style="width:70px"><div class="progress-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:var(--text-muted)">${pct}%</span></div></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function renderAllEvents() {
+  const div = document.getElementById('all-events-card');
+  if(!events.length){ div.innerHTML='<div class="empty-state"><div class="empty-icon">🌺</div><h3>No events yet</h3></div>'; return; }
+  const sorted = [...events].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  div.innerHTML = `<table class="etable"><thead><tr><th>#</th><th>Event</th><th>Date</th><th>Season</th><th>Package</th><th>Loc</th><th>MC</th><th>Sale ฿</th><th>Dep</th><th>Bal</th><th>Progress</th></tr></thead><tbody>${sorted.map((ev,i)=>{
+    const all=ev.checklist.flatMap(p=>p.items); const done=all.filter(i=>i.done).length; const pct=all.length?Math.round(done/all.length*100):0;
+    return `<tr onclick="openDetail('${ev.id}')"><td style="color:var(--text-muted)">${i+1}</td><td><strong>${ev.name1} + ${ev.name2}</strong><br><span style="font-size:11px;color:var(--text-muted)">${ev.type}</span></td><td style="white-space:nowrap">${fmtDate(ev.date)}</td><td style="font-size:12px">${ev.season}</td><td><span class="badge badge-pkg" style="font-size:11px">${ev.pkg}</span></td><td>${ev.loc}</td><td style="font-size:12px">${ev.mc||'-'}</td><td>฿${fmtNum(ev.sale)}</td><td><span class="badge ${ev.depStatus==='paid'?'badge-paid':'badge-pending'}" style="font-size:10px">${ev.depStatus==='paid'?'Paid':'Pend'}</span></td><td><span class="badge ${ev.balStatus==='paid'?'badge-paid':'badge-pending'}" style="font-size:10px">${ev.balStatus==='paid'?'Paid':'Pend'}</span></td><td><div style="display:flex;align-items:center;gap:5px"><div class="progress-bar" style="width:60px"><div class="progress-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:var(--text-muted)">${pct}%</span></div></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+// -- REMINDERS --
+function buildReminders() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const reminders = [];
+  events.forEach(ev=>{
+    const ed = new Date(ev.date); ed.setHours(0,0,0,0);
+    const days = Math.ceil((ed-now)/86400000);
+    if(days < 0) return;
+    ev.checklist.forEach(phase=>{
+      phase.items.filter(i=>!i.done).forEach(item=>{
+        reminders.push({text:item.t, event:ev.name1+' + '+ev.name2+' · '+fmtDate(ev.date), days, id:ev.id});
+      });
+    });
+  });
+  return reminders.sort((a,b)=>a.days-b.days);
+}
+
+function renderReminders() {
+  const reminders = buildReminders();
+  const div = document.getElementById('reminders-list');
+  if(!reminders.length){ div.innerHTML='<div class="empty-state"><div class="empty-icon">✨</div><h3>All caught up!</h3><p>No pending tasks.</p></div>'; return; }
+  div.innerHTML = `<div class="card"><div class="card-header"><div class="card-title">🔔 All pending tasks (${reminders.length})</div></div>${reminders.map(r=>`
+    <div class="reminder-item" onclick="openDetail('${r.id}')" style="cursor:pointer">
+      <div class="rdot ${r.days<=3?'rdot-red':r.days<=7?'rdot-orange':'rdot-green'}"></div>
+      <div style="flex:1"><div class="reminder-text">${r.text}</div><div class="reminder-event">${r.event}</div></div>
+      <div class="reminder-days" style="color:${r.days<=3?'var(--danger)':r.days<=7?'var(--warning)':'var(--success)'}">${r.days} days</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+// -- REPORTS --
+function renderReports() {
+  const div = document.getElementById('reports-content');
+  if(!events.length){ div.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div><h3>No data yet</h3><p>Add events to see your business reports.</p></div>'; return; }
+
+  // By package
+  const byPkg = {};
+  events.forEach(ev=>{ byPkg[ev.pkg]=(byPkg[ev.pkg]||{count:0,rev:0}); byPkg[ev.pkg].count++; byPkg[ev.pkg].rev+=ev.sale||0; });
+
+  // By location
+  const byLoc = {};
+  events.forEach(ev=>{ byLoc[ev.loc]=(byLoc[ev.loc]||{count:0,rev:0}); byLoc[ev.loc].count++; byLoc[ev.loc].rev+=ev.sale||0; });
+
+  // By month sold
+  const byMonth = {};
+  events.forEach(ev=>{ if(!ev.soldOn) return; const k=ev.soldOn.slice(0,7); byMonth[k]=(byMonth[k]||0)+1; });
+
+  // By season
+  const bySeason = {};
+  events.forEach(ev=>{ const s=ev.season||'-'; bySeason[s]=(bySeason[s]||{count:0,rev:0,profit:0}); bySeason[s].count++; bySeason[s].rev+=ev.sale||0; bySeason[s].profit+=(ev.sale||0)-(ev.invoice||0)-(ev.commission||0); });
+
+  const totalRev = events.reduce((s,e)=>s+(e.sale||0),0);
+  const totalProfit = events.reduce((s,e)=>s+(e.sale||0)-(e.invoice||0)-(e.commission||0),0);
+  const pendingBal = events.filter(e=>e.balStatus!=='paid').reduce((s,e)=>s+(e.balance||0),0);
+  const pendingCom = events.filter(e=>e.comStatus==='pending').reduce((s,e)=>s+(e.commission||0),0);
+
+  div.innerHTML = `
+    <div class="stats-row" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-label">Total revenue</div><div class="stat-value stat-gold">฿${fmtNum(totalRev)}</div><div class="stat-sub">${events.length} events</div></div>
+      <div class="stat-card"><div class="stat-label">Est. total profit</div><div class="stat-value stat-green">฿${fmtNum(totalProfit)}</div><div class="stat-sub">after costs & commission</div></div>
+      <div class="stat-card"><div class="stat-label">Balances pending</div><div class="stat-value stat-red">฿${fmtNum(pendingBal)}</div><div class="stat-sub">to collect</div></div>
+      <div class="stat-card"><div class="stat-label">Commissions pending</div><div class="stat-value stat-red">฿${fmtNum(pendingCom)}</div><div class="stat-sub">to pay</div></div>
+    </div>
+    <div class="report-grid">
+      <div class="report-card"><h4>📦 Sales by Package</h4>${Object.entries(byPkg).sort((a,b)=>b[1].count-a[1].count).map(([k,v])=>`<div class="report-row"><span>${k}</span><span>${v.count} events · ฿${fmtNum(v.rev)}</span></div>`).join('')}</div>
+      <div class="report-card"><h4>📍 Sales by Location</h4>${Object.entries(byLoc).sort((a,b)=>b[1].count-a[1].count).map(([k,v])=>`<div class="report-row"><span>${k}</span><span>${v.count} events · ฿${fmtNum(v.rev)}</span></div>`).join('')}</div>
+      <div class="report-card"><h4>🗓 Sales by Month (sold date)</h4>${Object.entries(byMonth).sort().map(([k,v])=>`<div class="report-row"><span>${k}</span><span>${v} sales</span></div>`).join('')}</div>
+      <div class="report-card"><h4>🌴 Season Summary</h4>${Object.entries(bySeason).map(([k,v])=>`<div class="report-row"><span>${k}</span><span>${v.count} events · ฿${fmtNum(v.rev)} · profit ฿${fmtNum(v.profit)}</span></div>`).join('')}</div>
+    </div>
+  `;
+}
+
+// -- UI HELPERS --
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const map={dashboard:0,events:1,'new-event':2,reminders:3,reports:4,suppliers:5};
+  const items=document.querySelectorAll('.nav-item');
+  if(map[page]!==undefined) items[map[page]].classList.add('active');
+  if(page==='dashboard') renderDashboard();
+  if(page==='events') renderAllEvents();
+  if(page==='reminders') renderReminders();
+  if(page==='reports') renderReports();
+  if(page==='new-event') resetForm();
+  if(page==='suppliers') loadSuppliers();
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  ['checklist','timeline','info','pdfs'].forEach(t=>document.getElementById('tc-'+t).style.display='none');
+  document.getElementById('tc-'+tab.replace('tab-','')).style.display='block';
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function openDeleteModal(){ document.getElementById('delete-modal').classList.add('open'); }
+function closeModal(){ document.getElementById('delete-modal').classList.remove('open'); }
+function confirmDelete(){
+  deleteFromSheets(currentId);
+  events=events.filter(e=>e.id!==currentId); save(); closeModal();
+  showToast('Event deleted'); showPage('events');
+}
+
+function loadSuppliers() {
+  Object.entries(suppliers).forEach(([k,v])=>{ const el=document.getElementById('sup-'+k); if(el) el.value=v; });
+}
+
+function fmtDate(s) {
+  if(!s) return '-';
+  const p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+function fmtNum(n) {
+  if(!n && n!==0) return '0';
+  return Math.round(n).toLocaleString('pt-BR');
+}
+
+// -- INIT --
+renderDashboard();
+
+// -- GOOGLE SHEETS SYNC (background only) --
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrtveOA99aJOGCWoHmqP2CRb_nMKeaQEc5s4I2lPPWRiPB7RDHhjUS4fYzQPwi8WB2cQ/exec';
+
+async function sheetsSync(params) {
+  try {
+    const qs = Object.entries(params)
+      .map(([k,v]) => k + '=' + encodeURIComponent(typeof v === 'object' ? JSON.stringify(v) : String(v)))
+      .join('&');
+    const res = await fetch(SCRIPT_URL + '?' + qs);
+    const text = await res.text();
+    return JSON.parse(text);
+  } catch(e) {
+    console.warn('Sheets sync failed (offline?):', e.message);
+    return { status: 'error' };
+  }
+}
+
+function flattenEv(ev) {
+  return {
+    id:ev.id, name:ev.name, date:ev.date, soldOn:ev.soldOn, type:ev.type,
+    pkg:ev.pkg, loc:ev.loc, tod:ev.tod, time:ev.time, season:ev.season,
+    name1:ev.name1, name2:ev.name2, fullname1:ev.fullname1||'', fullname2:ev.fullname2||'',
+    cpf1:ev.cpf1||'', cpf2:ev.cpf2||'', whatsapp:ev.whatsapp||'', email:ev.email||'',
+    hotel:ev.hotel||'', refby:ev.refby||'', mc:ev.mc||'', guests:ev.guests||'',
+    paymethod:ev.paymethod||'', sale:ev.sale||0, invoice:ev.invoice||0,
+    deposit:ev.deposit||0, depStatus:ev.depStatus||'', balance:ev.balance||0,
+    balStatus:ev.balStatus||'', commission:ev.commission||0, comStatus:ev.comStatus||'',
+    bouquet:ev.bouquet||'', head:ev.head||'', shirt:ev.shirt||'', flowerNotes:ev.flowerNotes||'',
+    s1:ev.s1||'', s2:ev.s2||'', s3:ev.s3||'', s4:ev.s4||'', s5:ev.s5||'',
+    addons:ev.addons||[], notes:ev.notes||'', checklist:ev.checklist||[], createdAt:ev.createdAt||'',
+  };
+}
+
+async function syncFromSheets() {
+  const result = await sheetsSync({action:'getEvents'});
+  if(result.status === 'ok' && result.events && result.events.length > 0) {
+    const sheetEvents = result.events.map(ev => ({
+      id: String(ev.ID), name: ev.Name, date: ev.Date, soldOn: ev.DateSold,
+      type: ev.Type, pkg: ev.Package, loc: ev.Location, tod: ev.TimeOfDay,
+      time: ev.Time, season: ev.Season, name1: ev.Name1, name2: ev.Name2,
+      fullname1: ev.FullName1||'', fullname2: ev.FullName2||'',
+      cpf1: ev.CPF1||'', cpf2: ev.CPF2||'',
+      whatsapp: ev.WhatsApp||'', email: ev.Email||'', hotel: ev.Hotel||'',
+      refby: ev.RefBy||'', mc: ev.MC||'', guests: ev.Guests||'',
+      paymethod: ev.PayMethod||'',
+      sale: parseFloat(ev.Sale)||0, invoice: parseFloat(ev.Invoice)||0,
+      deposit: parseFloat(ev.Deposit)||0, depStatus: ev.DepStatus||'',
+      balance: parseFloat(ev.Balance)||0, balStatus: ev.BalStatus||'',
+      commission: parseFloat(ev.Commission)||0, comStatus: ev.ComStatus||'',
+      bouquet: ev.Bouquet||'', head: ev.Head||'', shirt: ev.Shirt||'',
+      flowerNotes: ev.FlowerNotes||'',
+      s1: ev.Song1||'', s2: ev.Song2||'', s3: ev.Song3||'',
+      s4: ev.Song4||'', s5: ev.Song5||'',
+      addons: typeof ev.Addons==='string' ? JSON.parse(ev.Addons||'[]') : (ev.Addons||[]),
+      notes: ev.Notes||'',
+      checklist: typeof ev.Checklist==='string' ? JSON.parse(ev.Checklist||'[]') : (ev.Checklist||[]),
+      createdAt: ev.CreatedAt||'',
+    }));
+    // Merge: sheet is source of truth
+    events = sheetEvents;
+    localStorage.setItem('fk_events_v2', JSON.stringify(events));
+    showToast('✓ Synced with Google Sheets');
+    renderDashboard();
+  }
+}
+
+// Auto-sync on load
+window.addEventListener('load', () => {
+  setTimeout(syncFromSheets, 1000);
+});
+
+</script>
+</body>
+</html>
