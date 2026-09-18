@@ -246,6 +246,10 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span>Reports</span>
     </div>
+    <div class="nav-item" onclick="showPage('submissions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>New Enquiries</span>
+    </div>
     <div class="nav-item" onclick="showPage('suppliers')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Suppliers</span>
@@ -264,8 +268,8 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
   <div style="padding:28px 32px">
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">Active Events</div><div class="stat-value stat-gold" id="s-active">0</div><div class="stat-sub">this season</div></div>
-      <div class="stat-card"><div class="stat-label">Revenue (season)</div><div class="stat-value stat-green" id="s-revenue">฿0</div><div class="stat-sub">total sales</div></div>
-      <div class="stat-card"><div class="stat-label">Balance Pending</div><div class="stat-value stat-red" id="s-pending">฿0</div><div class="stat-sub">to be collected</div></div>
+      <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-value" id="s-month">0</div><div class="stat-sub">events in calendar</div></div>
+      <div class="stat-card"><div class="stat-label">Upcoming (7 days)</div><div class="stat-value" id="s-upcoming">0</div><div class="stat-sub">events soon</div></div>
       <div class="stat-card"><div class="stat-label">Needs Attention</div><div class="stat-value stat-red" id="s-urgent">0</div><div class="stat-sub">overdue tasks</div></div>
     </div>
     <div class="card" style="margin-bottom:20px">
@@ -494,6 +498,17 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
   <div style="padding:28px 32px" id="reports-content"></div>
 </div>
 
+<!-- SUBMISSIONS -->
+<div class="page" id="page-submissions">
+  <div class="topbar">
+    <div class="topbar-title">New <span>Enquiries</span></div>
+    <button class="btn btn-primary" onclick="loadSubmissions()">Refresh</button>
+  </div>
+  <div style="padding:28px 32px" id="submissions-content">
+    <div class="empty-state"><div class="empty-icon">📬</div><h3>Loading enquiries...</h3></div>
+  </div>
+</div>
+
 <!-- SUPPLIERS -->
 <div class="page" id="page-suppliers">
   <div class="topbar"><div class="topbar-title">Supplier <span>Contacts</span></div></div>
@@ -579,79 +594,69 @@ function saveSuppliers() {
 
 // -- CHECKLIST BUILDER --
 function buildChecklist(pkg, loc, addons) {
-  const isBeach = loc === 'Railay' || loc === 'Phi Phi' || loc === 'Krabi';
   const isRailay = loc === 'Railay';
   const hasVideo = addons.includes('Videomaker');
   const hasCeremony = !pkg.includes('Light');
-  const hasEntrance = pkg.includes('Western') || pkg.includes('Buddhist') || isBeach;
+  const hasPicnic = addons.includes('Picnic') || pkg.includes('Premium') || pkg.includes('Deluxe') || pkg.includes('Classic');
+  const boatTask = isRailay ? 'Book boat - Railay (Kung handles)' : 'Book boat - '+loc+' (Franci handles)';
+  const boatOwner = isRailay ? 'kung' : 'franci';
 
   return [
-    { phase:'📋 Upon booking', color:'default', items:[
-      {t:'Send reservation form to couple',o:'franci'},
-      {t:'Send contract for e-signature',o:'franci'},
-      {t:'Send payment link for deposit (30%)',o:'franci'},
-      {t:'Send wedding form (30-day questionnaire)',o:'franci'},
-      {t:'Add event to Google Calendar with all details',o:'franci'},
-      {t:'Add Kung, photographer and suppliers to Google Calendar event',o:'franci'},
-      {t:'Season start: bulk order clipboards, wine glasses, sand bottles, gifts (Lazada)',o:'franci'},
+    { phase:'Upon booking', color:'default', items:[
+      {t:'Fill out additional event information in the system', o:'franci', done:false},
+      {t:'Add event to Google Calendar with all details', o:'franci', done:false},
+      {t:'Generate contract', o:'franci', done:false},
+      {t:'Send confirmation message with: wedding form + contract + payment link for deposit (30%)', o:'franci', done:false},
     ]},
-    { phase:'📅 7 days after sending contract', color:'default', items:[
-      {t:'Follow up if contract not signed yet',o:'franci'},
-      {t:'Follow up if deposit payment not received yet',o:'franci'},
+    { phase:'7 days after sending contract', color:'default', items:[
+      {t:'Follow up if contract has been signed yet', o:'franci', done:false},
+      {t:'Follow up if deposit payment has been received yet', o:'franci', done:false},
     ]},
-    { phase:'📅 After deposit payment received', color:'default', items:[
-      {t:'Create Google Drive folder for photographer and share link with couple',o:'franci'},
-      {t:'Record deposit payment in spreadsheet',o:'kung'},
+    { phase:'After deposit payment received', color:'default', items:[
+      {t:'Record deposit payment in the spreadsheet', o:'franci', done:false},
+      {t:'Create Google Drive folder for the event', o:'franci', done:false},
+      {t:'Add Kung and the rest of the team to Google Calendar event', o:'franci', done:false},
     ]},
-    { phase:'📅 30 days before', color:'default', items:[
-      {t:'Check couple completed the wedding form',o:'franci'},
-      {t:'Send event summary to Kung as soon as form is filled',o:'franci'},
-      {t:'Confirm flower choices and share reference images with Kung',o:'franci'},
+    { phase:'30 days before', color:'default', items:[
+      {t:'Follow up if the wedding form has been completed by the couple', o:'franci', done:false},
+      {t:'Generate complete event summary for Kung as soon as the form is received', o:'franci', done:false},
+      {t:'Send event summary to Kung', o:'franci', done:false},
+      {t:'Generate and print event summary for Franci', o:'franci', done:false},
     ]},
-    { phase:'📅 2-3 weeks before', color:'default', items:[
-      {t: isRailay ? 'Book boat - Railay (Kung handles)' : 'Book boat - '+loc+' (Franci handles)', o: isRailay ? 'kung':'franci'},
-      {t:'Send event instructions to couple (video call or written)',o:'franci'},
-      {t:'Include Google Drive link in instructions (photos available 60 days)',o:'franci'},
-      {t:'Send payment link for remaining balance',o:'franci'},
-      {t:'Order flowers',o:'kung'},
-      ...(hasVideo ? [{t:'Confirm song choices with couple for official video (2 songs)',o:'franci'}] : []),
-      ...(hasVideo ? [{t:'Send song list to videomaker',o:'franci'}] : []),
+    { phase:'2-3 weeks before', color:'default', items:[
+      {t:'Follow up if Kung received event summary', o:'franci', done:false},
+      {t:boatTask, o:boatOwner, done:false},
+      {t:'Send event instructions to couple (video call and/or written), including Google Drive link', o:'franci', done:false},
+      {t:'Send payment link for remaining balance', o:'franci', done:false},
+      {t:'Order flowers', o:'kung', done:false},
+      {t:'Generate and print certificate', o:'franci', done:false},
+      ...(hasVideo ? [{t:'Confirm song choices with couple for official video', o:'franci', done:false}] : []),
     ]},
-    { phase:'📅 1 week before', color:'default', items:[
-      {t:'Confirm couple\'s hotel name',o:'franci'},
-      {t:'Book taxi / transfer',o:'franci'},
-      {t:'Confirm photographer with full event details',o:'franci'},
-      ...(hasVideo ? [{t:'Confirm videomaker with full event details',o:'franci'}] : []),
-      ...(addons.includes('Social Media') ? [{t:'Confirm social media person with full event details',o:'franci'}] : []),
-      {t:'Confirm boat (guest count, time, location)',o: isRailay ? 'kung':'franci'},
-      {t:'Brief Kung with complete event details',o:'franci'},
-      {t:'Generate and send Kung\'s PDF brief via WhatsApp',o:'franci'},
-      ...(addons.includes('Picnic') ? [{t:'Confirm picnic items with Kung (dietary restrictions, drinks)',o:'franci'}] : []),
-      ...(addons.includes('Making of') ? [{t:'Confirm making of logistics with photographer/videomaker',o:'franci'}] : []),
+    { phase:'1 week before', color:'default', items:[
+      {t:'Confirm couple hotel name', o:'franci', done:false},
+      {t:'Follow up if remaining balance has been paid', o:'franci', done:false},
+      {t:'Book taxi / transfer', o:'kung', done:false},
+      {t:'Create invoice for accountant', o:'kung', done:false},
+      {t:'Transfer payment to Voa bank account', o:'kung', done:false},
+      {t:'Create WhatsApp group with team confirming all details and planned schedule', o:'franci', done:false},
+      {t:'Confirm boat (guest count, time, location)', o:'franci', done:false},
+      ...(hasPicnic ? [{t:'Buy food and drinks for picnic', o:'kung', done:false}] : []),
+      {t:'Confirm flowers with Kung', o:'franci', done:false},
     ]},
-    { phase:'📅 Day before', color:'default', items:[
-      {t:'Confirm boat reservation',o: isRailay ? 'kung':'franci'},
-      {t:'Confirm taxi / transfer',o:'franci'},
-      {t:'Check sparkling wine and glasses',o:'kung'},
-      {t:'Check speaker and charge battery',o:'franci'},
-      {t:'Confirm flowers with Kung',o:'franci'},
-      ...(hasCeremony ? [{t:'Check ceremony kit: sand shell, 2 glasses, sand, ring bearer shell, script, certificate',o:'franci'}] : []),
-      ...(hasCeremony ? [{t:'Check gift bag: Lucie gift + small sand jar + dreamcatcher with couple\'s names',o:'franci'}] : []),
-      ...(addons.includes('Picnic') ? [{t:'Confirm picnic (snacks + drinks) with Kung',o:'kung'}] : []),
-      ...(addons.includes('Hair & Makeup') || addons.includes('Hair & Makeup 2x') ? [{t:'Confirm hair & makeup artist - hotel name and time',o:'franci'}] : []),
+    { phase:'Day before', color:'default', items:[
+      {t:'Confirm boat reservation', o:'both', done:false},
+      {t:'Confirm taxi / transfer', o:'kung', done:false},
+      ...(hasPicnic ? [{t:'Prepare food, drinks, accessories for picnic and gift bag', o:'kung', done:false}] : []),
+      {t:'Check speaker and charge battery', o:'franci', done:false},
+      ...(hasCeremony ? [{t:'Prepare ceremony kit: sand shell, 2 glasses, sand, ring bearer shell, script, certificate', o:'franci', done:false}] : []),
+      ...(hasCeremony ? [{t:'Prepare gift: Lucie gift + small sand jar + dreamcatcher with couple names', o:'franci', done:false}] : []),
     ]},
-    { phase:'✅ After the event', color:'default', items:[
-      {t:'Check photographer uploaded photos to Google Drive',o:'franci'},
-      {t:'Share Drive folder link with couple',o:'franci'},
-      {t:'Create invoice for accountant',o:'kung'},
-      {t:'Record final payment in spreadsheet',o:'kung'},
-      {t:'Send thank-you message to couple',o:'franci'},
-      {t:'Note couple\'s wedding anniversary date for future message',o:'franci'},
-      {t:'Post on social media if couple authorized image use',o:'franci'},
-      ...(hasVideo ? [{t:'Confirm Reels delivered within 48h',o:'franci'}] : []),
-      ...(hasVideo ? [{t:'Confirm official video delivered on agreed date',o:'franci'}] : []),
+    { phase:'After the event', color:'default', items:[
+      {t:'Follow up images with media team', o:'franci', done:false},
+      {t:'Send thank-you message to couple', o:'franci', done:false},
+      {t:'Pay all suppliers involved', o:'kung', done:false},
     ]},
-  ].map(p => ({ ...p, items: p.items.map(i => ({...i, done:false})) }));
+  ];
 }
 
 // -- TIMELINE BUILDER --
@@ -899,7 +904,7 @@ function renderChecklist(ev) {
         <div class="check-item ${item.done?'done':''}" id="ci-${pi}-${ii}">
           <input type="checkbox" ${item.done?'checked':''} onchange="toggleCheck(${pi},${ii})">
           <label onclick="toggleCheck(${pi},${ii})">${item.t}</label>
-          <span class="owner-tag ${item.o==='franci'?'owner-franci':'owner-kung'}">${item.o==='franci'?'🌸 Franci':'🤝 Kung'}</span>
+          <span class="owner-tag ${item.o==='franci'?'owner-franci':item.o==='kung'?'owner-kung':'owner-both'}">${item.o==='franci'?'🌸 Franci':item.o==='kung'?'🤝 Kung':'👥 Both'}</span>
           ${!item.done && daysToEvent<=7?'<span class="late-tag">⚠️ Urgent</span>':''}
         </div>
       `).join('')}
@@ -1021,12 +1026,13 @@ function pdfVideo() {
 function renderDashboard() {
   const now = new Date(); now.setHours(0,0,0,0);
   const in7 = new Date(now.getTime()+7*86400000);
-  const totalRevenue = events.reduce((s,e)=>s+(e.sale||0),0);
-  const totalPending = events.reduce((s,e)=>e.balStatus!=='paid'?s+(e.balance||0):s,0);
   const urgent = buildReminders().filter(r=>r.days<=3).length;
+  const nowD = new Date();
+  const thisMonthCount = events.filter(e => { const d=new Date(e.date); return d.getMonth()===nowD.getMonth()&&d.getFullYear()===nowD.getFullYear(); }).length;
+  const upcomingCount = events.filter(e => { const d=new Date(e.date); d.setHours(0,0,0,0); const now0=new Date(); now0.setHours(0,0,0,0); const diff=Math.ceil((d-now0)/86400000); return diff>=0&&diff<=7; }).length;
   document.getElementById('s-active').textContent = events.length;
-  document.getElementById('s-revenue').textContent = '฿'+fmtNum(totalRevenue);
-  document.getElementById('s-pending').textContent = '฿'+fmtNum(totalPending);
+  document.getElementById('s-month').textContent = thisMonthCount;
+  document.getElementById('s-upcoming').textContent = upcomingCount;
   document.getElementById('s-urgent').textContent = urgent;
 
   const reminders = buildReminders().slice(0,6);
@@ -1135,13 +1141,14 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  const map={dashboard:0,events:1,'new-event':2,reminders:3,reports:4,suppliers:5};
+  const map={dashboard:0,events:1,'new-event':2,reminders:3,reports:4,submissions:5,suppliers:6};
   const items=document.querySelectorAll('.nav-item');
   if(map[page]!==undefined) items[map[page]].classList.add('active');
   if(page==='dashboard') renderDashboard();
   if(page==='events') renderAllEvents();
   if(page==='reminders') renderReminders();
   if(page==='reports') renderReports();
+  if(page==='submissions') loadSubmissions();
   if(page==='new-event') resetForm();
   if(page==='suppliers') loadSuppliers();
 }
@@ -1179,6 +1186,46 @@ function fmtDate(s) {
 function fmtNum(n) {
   if(!n && n!==0) return '0';
   return Math.round(n).toLocaleString('pt-BR');
+}
+
+// -- SUBMISSIONS --
+async function loadSubmissions() {
+  const div = document.getElementById('submissions-content');
+  if(div) div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>Loading...</h3></div>';
+  const result = await sheetsSync({action:'getSubmissions'});
+  if(result.status === 'ok') {
+    renderSubmissions(result.submissions || []);
+  } else {
+    if(div) div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>Could not load enquiries</h3></div>';
+  }
+}
+
+function renderSubmissions(subs) {
+  const div = document.getElementById('submissions-content');
+  if(!div) return;
+  const newSubs = subs.filter(s => s.Status === 'new');
+  if(!subs.length) {
+    div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>No enquiries yet</h3><p>Share your reservation form link with couples to get started.</p><br><div style="background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-light)">Your form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div></div>';
+    return;
+  }
+  div.innerHTML = '<div style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">'+newSubs.length+' new enquir'+(newSubs.length===1?'y':'ies')+' waiting — '+subs.length+' total</div>' +
+  '<div class="card">' +
+  subs.map((s,i) => {
+    const isNew = s.Status === 'new';
+    return '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;background:'+( isNew ? 'var(--gold-pale)' : 'white')+'">'+
+      '<div style="flex:1">'+
+        '<div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px">'+s.Name1+' + '+s.Name2+'</div>'+
+        '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">'+
+          (s.EventType||'')+(s.Package?' · '+s.Package:'')+(s.Location?' · '+s.Location:'')+(s.Date?' · '+fmtDate(s.Date):'')+'</div>'+
+        '<div style="font-size:12px;color:var(--text-light)">'+
+          (s.WhatsApp||s.Email||'')+(s.RefBy?' · Via: '+s.RefBy:'')+'</div>'+
+        (s.Addons?'<div style="font-size:11px;color:var(--text-muted);margin-top:4px">Add-ons/notes: '+s.Addons+'</div>':'')+'</div>'+
+      '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+
+        (isNew?'<span class="badge badge-partial">New</span>':'<span class="badge badge-paid">Processed</span>')+
+        '<div style="font-size:10px;color:var(--text-muted)">'+(s.SubmittedAt?new Date(s.SubmittedAt).toLocaleDateString('pt-BR'):'')+' </div></div>'+
+    '</div>';
+  }).join('') + '</div>' +
+  '<div style="margin-top:12px;padding:14px 18px;background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;font-size:13px;color:var(--text-light)">Your reservation form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div>';
 }
 
 // -- INIT --
