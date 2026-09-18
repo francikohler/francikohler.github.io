@@ -1193,6 +1193,7 @@ function fmtNum(n) {
 
 // -- SUBMISSIONS --
 async function loadSubmissions() {
+  window._enquiriesChecked = false;
   const div = document.getElementById('submissions-content');
   if(div) div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>Loading...</h3></div>';
   const result = await sheetsSync({action:'getSubmissions'});
@@ -1281,6 +1282,8 @@ function createEventFromEnquiry(idx) {
 }
 
 function checkNewEnquiries() {
+  if(window._enquiriesChecked) return;
+  window._enquiriesChecked = true;
   const seenSubs = JSON.parse(localStorage.getItem('fk_seen_subs') || '[]');
   sheetsSync({action:'getSubmissions'}).then(function(result) {
     if(result.status !== 'ok') return;

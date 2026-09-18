@@ -459,6 +459,10 @@ function updateSteps(current) {
 
 // ── SUBMIT ──
 async function submitForm() {
+  if(window._submitting) return;
+  window._submitting = true;
+  const btn = document.querySelector('[onclick="submitForm()"]');
+  if(btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
   const name1 = document.getElementById('f-name1').value.trim();
   const name2 = document.getElementById('f-name2').value.trim();
   const wa = document.getElementById('f-wa').value.trim();
@@ -470,7 +474,7 @@ async function submitForm() {
   if(!name2){ showError('err-name2'); valid=false; }
   if(!wa){ showError('err-wa'); valid=false; }
   if(!email || !email.includes('@')){ showError('err-email'); valid=false; }
-  if(!valid) return;
+  if(!valid) { window._submitting=false; if(btn) { btn.disabled=false; btn.textContent='Enviar reserva'; } return; }
 
   state.name1=name1; state.name2=name2;
   state.cpf1=cpf1;
