@@ -1193,7 +1193,6 @@ function fmtNum(n) {
 
 // -- SUBMISSIONS --
 async function loadSubmissions() {
-  window._enquiriesChecked = false;
   const div = document.getElementById('submissions-content');
   if(div) div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>Loading...</h3></div>';
   const result = await sheetsSync({action:'getSubmissions'});
@@ -1208,13 +1207,9 @@ function renderSubmissions(subs) {
   const div = document.getElementById('submissions-content');
   if(!div) return;
 
-  // Mark new ones in localStorage so dashboard can show badge
-  const seen = JSON.parse(localStorage.getItem('fk_seen_subs') || '[]');
-  const newSubs = subs.filter(s => !seen.includes(s.ID || s.SubmittedAt));
-  if(newSubs.length) {
-    const allSeen = subs.map(s => s.ID || s.SubmittedAt);
-    localStorage.setItem('fk_seen_subs', JSON.stringify(allSeen));
-  }
+  // Mark all as seen now that user is viewing the submissions page
+  const allSeen = subs.map(s => s.ID || s.SubmittedAt);
+  localStorage.setItem('fk_seen_subs', JSON.stringify(allSeen));
 
   if(!subs.length) {
     div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>No enquiries yet</h3><p>Share your reservation form with couples to get started.</p><br><div style="background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-light)">Your form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div></div>';
@@ -1282,8 +1277,6 @@ function createEventFromEnquiry(idx) {
 }
 
 function checkNewEnquiries() {
-  if(window._enquiriesChecked) return;
-  window._enquiriesChecked = true;
   const seenSubs = JSON.parse(localStorage.getItem('fk_seen_subs') || '[]');
   sheetsSync({action:'getSubmissions'}).then(function(result) {
     if(result.status !== 'ok') return;
