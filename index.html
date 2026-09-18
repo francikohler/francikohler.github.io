@@ -272,6 +272,7 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
       <div class="stat-card"><div class="stat-label">Upcoming (7 days)</div><div class="stat-value" id="s-upcoming">0</div><div class="stat-sub">events soon</div></div>
       <div class="stat-card"><div class="stat-label">Needs Attention</div><div class="stat-value stat-red" id="s-urgent">0</div><div class="stat-sub">overdue tasks</div></div>
     </div>
+    <div id="dash-enquiry-alert"></div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-header"><div class="card-title">🔔 What needs your attention today</div></div>
       <div id="dash-reminders"><div class="empty-state" style="padding:24px"><div style="font-size:20px">✨</div><div style="font-size:13px;color:var(--text-muted);margin-top:6px">All caught up! Add your first event to get started.</div></div></div>
@@ -1035,6 +1036,8 @@ function renderDashboard() {
   document.getElementById('s-upcoming').textContent = upcomingCount;
   document.getElementById('s-urgent').textContent = urgent;
 
+  // New enquiries alert
+  checkNewEnquiries();
   const reminders = buildReminders().slice(0,6);
   const remDiv = document.getElementById('dash-reminders');
   remDiv.innerHTML = reminders.length ? reminders.map(r=>`
@@ -1203,29 +1206,107 @@ async function loadSubmissions() {
 function renderSubmissions(subs) {
   const div = document.getElementById('submissions-content');
   if(!div) return;
-  const newSubs = subs.filter(s => s.Status === 'new');
+
+  // Mark new ones in localStorage so dashboard can show badge
+  const seen = JSON.parse(localStorage.getItem('fk_seen_subs') || '[]');
+  const newSubs = subs.filter(s => !seen.includes(s.ID || s.SubmittedAt));
+  if(newSubs.length) {
+    const allSeen = subs.map(s => s.ID || s.SubmittedAt);
+    localStorage.setItem('fk_seen_subs', JSON.stringify(allSeen));
+  }
+
   if(!subs.length) {
-    div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>No enquiries yet</h3><p>Share your reservation form link with couples to get started.</p><br><div style="background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-light)">Your form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div></div>';
+    div.innerHTML = '<div class="empty-state"><div class="empty-icon">📬</div><h3>No enquiries yet</h3><p>Share your reservation form with couples to get started.</p><br><div style="background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--text-light)">Your form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div></div>';
     return;
   }
-  div.innerHTML = '<div style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">'+newSubs.length+' new enquir'+(newSubs.length===1?'y':'ies')+' waiting — '+subs.length+' total</div>' +
+
+  div.innerHTML = '<div style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">'+subs.length+' total enquir'+(subs.length===1?'y':'ies')+'</div>' +
   '<div class="card">' +
   subs.map((s,i) => {
-    const isNew = s.Status === 'new';
-    return '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;background:'+( isNew ? 'var(--gold-pale)' : 'white')+'">'+
-      '<div style="flex:1">'+
-        '<div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px">'+s.Name1+' + '+s.Name2+'</div>'+
-        '<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">'+
-          (s.EventType||'')+(s.Package?' · '+s.Package:'')+(s.Location?' · '+s.Location:'')+(s.Date?' · '+fmtDate(s.Date):'')+'</div>'+
-        '<div style="font-size:12px;color:var(--text-light)">'+
-          (s.WhatsApp||s.Email||'')+(s.RefBy?' · Via: '+s.RefBy:'')+'</div>'+
-        (s.Addons?'<div style="font-size:11px;color:var(--text-muted);margin-top:4px">Add-ons/notes: '+s.Addons+'</div>':'')+'</div>'+
-      '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">'+
-        (isNew?'<span class="badge badge-partial">New</span>':'<span class="badge badge-paid">Processed</span>')+
-        '<div style="font-size:10px;color:var(--text-muted)">'+(s.SubmittedAt?new Date(s.SubmittedAt).toLocaleDateString('pt-BR'):'')+' </div></div>'+
+    const bg = i % 2 === 0 ? 'white' : 'var(--gold-pale)';
+    const d = s.Date ? fmtDate(s.Date) : '';
+    return '<div style="padding:16px 20px;border-bottom:1px solid var(--border);background:'+bg+'">'+
+      '<div style="display:flex;align-items:flex-start;gap:14px">'+
+        '<div style="flex:1">'+
+          '<div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:4px">'+(s.Name1||'')+(s.Name2?' + '+s.Name2:'')+'</div>'+
+          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">'+
+            (s.EventType||'')+(s.Package?' · '+s.Package:'')+(s.Location?' · '+s.Location:'')+(d?' · '+d:'')+(s.TimeOfDay?' ('+s.TimeOfDay+')':'')+'</div>'+
+          '<div style="font-size:12px;color:var(--text-light);margin-bottom:4px">'+
+            (s.WhatsApp||'')+(s.Email?' · '+s.Email:'')+'</div>'+
+          (s.CPF1?'<div style="font-size:11px;color:var(--text-muted)">CPF: '+s.CPF1+'</div>':'')+
+          (s.RefBy?'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Via: '+s.RefBy+'</div>':'')+
+          (s.Addons?'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Notes: '+s.Addons+'</div>':'')+
+        '</div>'+
+        '<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">'+
+          '<div style="font-size:10px;color:var(--text-muted)">'+(s.SubmittedAt?new Date(s.SubmittedAt).toLocaleDateString('pt-BR'):'')+' </div>'+
+          '<button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="createEventFromEnquiry('+i+')">+ Create Event</button>'+
+        '</div>'+
+      '</div>'+
     '</div>';
   }).join('') + '</div>' +
-  '<div style="margin-top:12px;padding:14px 18px;background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;font-size:13px;color:var(--text-light)">Your reservation form link:<br><strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div>';
+  '<div style="margin-top:12px;padding:14px 18px;background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:8px;font-size:13px;color:var(--text-light)">Reservation form link: <strong style="color:var(--gold-dark)">https://francikohler.github.io/form</strong></div>';
+
+  // Store subs for createEventFromEnquiry
+  window._currentSubs = subs;
+}
+
+function createEventFromEnquiry(idx) {
+  const s = (window._currentSubs || [])[idx];
+  if(!s) return;
+  // Pre-fill the new event form with enquiry data
+  showPage('new-event');
+  setTimeout(() => {
+    if(s.Name1) document.getElementById('f-n1').value = s.Name1;
+    if(s.Name2) document.getElementById('f-n2').value = s.Name2;
+    if(s.CPF1) document.getElementById('f-cpf1').value = s.CPF1;
+    if(s.CPF2) document.getElementById('f-cpf2').value = s.CPF2;
+    if(s.WhatsApp) document.getElementById('f-wa').value = s.WhatsApp;
+    if(s.Email) document.getElementById('f-email').value = s.Email;
+    if(s.RefBy) document.getElementById('f-refby').value = s.RefBy;
+    if(s.Date) document.getElementById('f-date').value = s.Date;
+    if(s.TimeOfDay) document.getElementById('f-tod').value = s.TimeOfDay;
+    if(s.Guests) document.getElementById('f-guests').value = s.Guests;
+    if(s.Package) document.getElementById('f-pkg').value = s.Package;
+    if(s.Location) document.getElementById('f-loc').value = s.Location;
+    if(s.EventType) {
+      const typeMap = {'casamento':'Wedding','renovacao':'Vow Renewal','proposta':'Wedding Proposal','ensaio':'Photoshoot'};
+      document.getElementById('f-type').value = typeMap[s.EventType] || s.EventType;
+    }
+    // Set sold date to today
+    document.getElementById('f-sold').value = new Date().toISOString().split('T')[0];
+    updateName();
+    updateFinances();
+    showToast('Form pre-filled from enquiry - review and save!');
+  }, 100);
+}
+
+function checkNewEnquiries() {
+  const seenSubs = JSON.parse(localStorage.getItem('fk_seen_subs') || '[]');
+  sheetsSync({action:'getSubmissions'}).then(function(result) {
+    if(result.status !== 'ok') return;
+    const subs = result.submissions || [];
+    const unseen = subs.filter(function(s) { return !seenSubs.includes(s.ID || s.SubmittedAt); });
+    const alertDiv = document.getElementById('dash-enquiry-alert');
+    if(!alertDiv) return;
+    if(unseen.length > 0) {
+      const label = unseen.length + ' new enquir' + (unseen.length === 1 ? 'y' : 'ies') + ' waiting';
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      btn.style.cssText = 'font-size:12px;padding:6px 14px';
+      btn.textContent = 'View';
+      btn.onclick = function() { showPage('submissions'); };
+      const msg = document.createElement('strong');
+      msg.textContent = label;
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between';
+      wrap.appendChild(msg);
+      wrap.appendChild(btn);
+      alertDiv.innerHTML = '';
+      alertDiv.appendChild(wrap);
+    } else {
+      alertDiv.innerHTML = '';
+    }
+  });
 }
 
 // -- INIT --
