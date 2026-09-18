@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Franci Kohler · Formulário de Reserva</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+:root {
+  --gold:#D2AA82;--gold-dark:#B8895E;--gold-light:#E6D5BE;--gold-pale:#F7F0E6;
+  --white:#FFFFFF;--off-white:#FAF7F3;--text:#3D2E1E;--text-light:#8A7060;
+  --text-muted:#B5A090;--border:#E8D9C5;--danger:#B5675B;
+  --shadow:0 4px 24px rgba(180,140,100,0.13);--shadow-lg:0 12px 48px rgba(180,140,100,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text);min-height:100vh;padding:0;}
+
+/* HEADER */
+.form-header{background:var(--text);padding:32px 20px 28px;text-align:center;}
+.form-header img{border-radius:50%;width:88px;height:88px;object-fit:cover;border-radius:50%;opacity:1;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;}
+.form-header-title{font-family:'Cormorant Garamond',serif;color:var(--gold-light);font-size:26px;font-weight:300;letter-spacing:0.04em;margin-bottom:4px;}
+.form-header-sub{font-size:12px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* FORM WRAPPER */
+.form-wrap{max-width:560px;margin:0 auto;padding:32px 20px 60px;}
+
+/* INTRO */
+.form-intro{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:24px;box-shadow:var(--shadow);text-align:center;}
+.form-intro p{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text-light);line-height:1.6;font-style:italic;}
+
+/* STEP INDICATOR */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px;}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;transition:all 0.3s;}
+.step-dot.active{background:var(--gold);color:var(--white);}
+.step-dot.done{background:var(--gold-dark);color:var(--white);}
+.step-dot.inactive{background:var(--border);color:var(--text-muted);}
+.step-line{flex:1;height:2px;background:var(--border);max-width:40px;transition:background 0.3s;}
+.step-line.done{background:var(--gold-dark);}
+
+/* CARD */
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:26px 24px;box-shadow:var(--shadow);margin-bottom:16px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.card-title span{font-size:22px;}
+
+/* FORM FIELDS */
+.fgroup{margin-bottom:16px;}
+.flabel{display:block;font-size:12px;font-weight:500;color:var(--text-light);letter-spacing:0.04em;margin-bottom:5px;}
+.flabel .req{color:var(--danger);}
+.finput,.fselect,.ftextarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);transition:border-color 0.2s;outline:none;appearance:none;-webkit-appearance:none;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(210,170,130,0.15);}
+.finput::placeholder,.ftextarea::placeholder{color:var(--text-muted);}
+.ftextarea{resize:vertical;min-height:80px;}
+.frow-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* SELECT WRAPPER */
+.select-wrap{position:relative;}
+.select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px;}
+
+/* OPTION CARDS (event type / package) */
+.option-grid{display:grid;gap:10px;}
+.option-grid-2{grid-template-columns:1fr 1fr;}
+.option-card{border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.2s;text-align:left;background:var(--white);}
+.option-card:hover{border-color:var(--gold);background:var(--gold-pale);}
+.option-card.selected{border-color:var(--gold-dark);background:var(--gold-pale);}
+.option-card-icon{font-size:22px;margin-bottom:6px;}
+.option-card-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;color:var(--text);}
+.option-card-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.option-card.selected .option-card-title{color:var(--gold-dark);}
+
+/* PKG OPTIONS */
+.pkg-option{border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;transition:all 0.2s;background:var(--white);font-size:13px;color:var(--text);}
+.pkg-option:hover{border-color:var(--gold);background:var(--gold-pale);}
+.pkg-option.selected{border-color:var(--gold-dark);background:var(--gold-pale);color:var(--gold-dark);font-weight:500;}
+
+/* LOCATION OPTIONS */
+.loc-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.loc-option{border:1.5px solid var(--border);border-radius:20px;padding:7px 16px;cursor:pointer;transition:all 0.2s;font-size:13px;color:var(--text-light);background:var(--white);}
+.loc-option:hover{border-color:var(--gold);color:var(--text);}
+.loc-option.selected{border-color:var(--gold-dark);background:var(--gold-dark);color:var(--white);}
+
+/* HIDDEN */
+.hidden{display:none!important;}
+
+/* NAVIGATION */
+.form-nav{display:flex;gap:10px;justify-content:space-between;margin-top:20px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--gold);color:var(--white);width:100%;justify-content:center;}
+.btn-primary:hover{background:var(--gold-dark);}
+.btn-back{background:transparent;border:1.5px solid var(--border);color:var(--text-light);padding:11px 20px;}
+.btn-back:hover{border-color:var(--gold);color:var(--gold-dark);}
+
+/* ERROR */
+.error-msg{font-size:12px;color:var(--danger);margin-top:4px;display:none;}
+.error-msg.show{display:block;}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:40px 20px;}
+.success-icon{font-size:56px;margin-bottom:20px;}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:14px;}
+.success-msg{font-size:15px;color:var(--text-light);line-height:1.7;max-width:400px;margin:0 auto;}
+.success-sig{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--gold-dark);margin-top:20px;}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* NOTE */
+.form-note{font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;line-height:1.5;}
+
+@media(max-width:480px){
+  .frow-2{grid-template-columns:1fr;}
+  .option-grid-2{grid-template-columns:1fr;}
+  .form-wrap{padding:24px 16px 48px;}
+}
+</style>
+</head>
+<body>
+
+<div class="form-header">
+  
+  <div class="form-header-title">Franci Kohler</div>
+  <div class="form-header-sub">Casamentos na Tailândia</div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- INTRO -->
+  <div class="form-intro">
+    <p>Que alegria ter você aqui!<br>Preencha o formulário abaixo para iniciarmos a sua reserva.</p>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="steps">
+    <div class="step-dot active" id="sdot-1">1</div>
+    <div class="step-line" id="sline-1"></div>
+    <div class="step-dot inactive" id="sdot-2">2</div>
+    <div class="step-line" id="sline-2"></div>
+    <div class="step-dot inactive" id="sdot-3">3</div>
+    <div class="step-line" id="sline-3"></div>
+    <div class="step-dot inactive" id="sdot-4">4</div>
+  </div>
+
+  <!-- STEP 1: TIPO DE EVENTO -->
+  <div id="step-1">
+    <div class="form-card">
+      <div class="card-title">Que tipo de evento você deseja?</div>
+      <div class="option-grid option-grid-2">
+        <div class="option-card" onclick="selectEventType('casamento')">
+          <div class="option-card-title">Casamento</div>
+          <div class="option-card-desc">Cerimônia oficial ou simbólica</div>
+        </div>
+        <div class="option-card" onclick="selectEventType('renovacao')">
+          <div class="option-card-title">Renovação de Votos</div>
+          <div class="option-card-desc">Reafirme o seu amor</div>
+        </div>
+        <div class="option-card" onclick="selectEventType('proposta')">
+          <div class="option-card-title">Proposta de Casamento</div>
+          <div class="option-card-desc">Um pedido inesquecível</div>
+        </div>
+        <div class="option-card" onclick="selectEventType('ensaio')">
+          <div class="option-card-title">Ensaio Fotográfico</div>
+          <div class="option-card-desc">Fotos na Tailândia</div>
+        </div>
+      </div>
+      <div class="error-msg" id="err-type">Por favor, selecione o tipo de evento.</div>
+    </div>
+    <div class="form-nav">
+      <button class="btn btn-primary" onclick="goStep(2)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: PACOTE + LOCAL -->
+  <div id="step-2" class="hidden">
+    <div class="form-card">
+      <div class="card-title">Escolha o seu pacote</div>
+      <div class="option-grid" id="pkg-options"></div>
+      <div class="error-msg" id="err-pkg">Por favor, selecione um pacote.</div>
+
+      <div id="loc-section" class="hidden" style="margin-top:20px">
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:12px;font-size:17px">Local</div>
+        <div class="loc-grid" id="loc-options"></div>
+        <div class="error-msg" id="err-loc">Por favor, selecione o local.</div>
+      </div>
+    </div>
+    <div class="form-nav">
+      <button class="btn btn-back" onclick="goStep(1)">← Voltar</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="goStep(3)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: DATA + HORÁRIO -->
+  <div id="step-3" class="hidden">
+    <div class="form-card">
+      <div class="card-title">Data e horário</div>
+      <div class="frow-2">
+        <div class="fgroup">
+          <label class="flabel">Data do evento <span class="req">*</span></label>
+          <input class="finput" id="f-date" type="date" min="">
+          <div class="error-msg" id="err-date">Por favor, informe a data.</div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Período <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select class="fselect" id="f-tod">
+              <option value="">Selecione</option>
+              <option value="Manhã">Manhã</option>
+              <option value="Tarde">Tarde</option>
+            </select>
+          </div>
+          <div class="error-msg" id="err-tod">Por favor, selecione o período.</div>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Número de convidados <span class="req">*</span></label>
+        <input class="finput" id="f-guests" type="number" min="2" placeholder="Ex: 2 (apenas o casal), 10...">
+        <div class="error-msg" id="err-guests">Por favor, informe o número de convidados.</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="card-title">Serviços adicionais</div>
+      <div class="fgroup">
+        <label class="flabel">Gostaria de adicionar ou remover algum serviço do seu pacote?</label>
+        <textarea class="ftextarea" id="f-addons" placeholder="Ex: Gostaria de adicionar cabelo e maquiagem. / Não preciso do transfer."></textarea>
+      </div>
+    </div>
+    <div class="form-nav">
+      <button class="btn btn-back" onclick="goStep(2)">← Voltar</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="goStep(4)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: DADOS PESSOAIS -->
+  <div id="step-4" class="hidden">
+    <div class="form-card">
+      <div class="card-title">Dados pessoais</div>
+
+      <div class="fgroup">
+        <label class="flabel">Noivo(a) 1 — Nome completo <span class="req">*</span></label>
+        <input class="finput" id="f-name1" placeholder="Seu nome completo">
+        <div class="error-msg" id="err-name1">Por favor, informe o nome completo.</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">CPF 1 <span class="req">*</span></label>
+        <input class="finput" id="f-cpf1" placeholder="000.000.000-00">
+        <div class="error-msg" id="err-cpf1">Por favor, informe o CPF.</div>
+      </div>
+      <div class="divider"></div>
+      <div class="fgroup">
+        <label class="flabel">Noivo(a) 2 — Nome completo <span class="req">*</span></label>
+        <input class="finput" id="f-name2" placeholder="Nome completo do(a) parceiro(a)">
+        <div class="error-msg" id="err-name2">Por favor, informe o nome completo.</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">CPF 2 (opcional)</label>
+        <input class="finput" id="f-cpf2" placeholder="000.000.000-00">
+      </div>
+      <div class="divider"></div>
+      <div class="fgroup">
+        <label class="flabel">WhatsApp <span class="req">*</span></label>
+        <input class="finput" id="f-wa" placeholder="+55 11 99999-9999">
+        <div class="error-msg" id="err-wa">Por favor, informe o WhatsApp.</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">E-mail <span class="req">*</span></label>
+        <input class="finput" id="f-email" type="email" placeholder="seuemail@email.com">
+        <div class="error-msg" id="err-email">Por favor, informe o e-mail.</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Como você nos conheceu?</label>
+        <input class="finput" id="f-refby" placeholder="Ex: Instagram, indicação de amigo, Google...">
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-back" onclick="goStep(3)">← Voltar</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="submitForm()">Enviar reserva</button>
+    </div>
+    <p class="form-note">Ao enviar, Franci receberá suas informações e entrará em contato em breve com o contrato e as instruções de pagamento.</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="step-success" class="hidden">
+    <div class="form-card success-screen">
+      
+      <div class="success-title">Reserva recebida!</div>
+      <div class="success-msg" id="success-msg">
+        Fico muito feliz com sua escolha. Vou dar início à sua reserva e em breve enviarei mais instruções.
+      </div>
+      <div class="success-sig">Franci Kohler ❤️</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── LOGO ──
+const LOGO = '';
+// logo removed
+
+// Set min date to today
+document.getElementById('f-date').min = new Date().toISOString().split('T')[0];
+
+// ── STATE ──
+let state = { eventType:'', pkg:'', loc:'', date:'', tod:'', guests:'', addons:'', name1:'', name2:'', cpf1:'', cpf2:'', wa:'', email:'', refby:'' };
+
+// ── PACKAGE / LOCATION DATA ──
+const PKG_DATA = {
+  casamento: {
+    groups: [
+      { label:'Longtail', pkgs:['Longtail Light','Longtail Essencial','Longtail Premium','Longtail Deluxe'] },
+      { label:'Ocidental', pkgs:['Ocidental Light','Ocidental Essencial','Ocidental Clássica'] },
+      { label:'Budista', pkgs:['Budista na Praia Essencial','Budista na Praia Clássica','Budista no Templo'] },
+    ]
+  },
+  renovacao: {
+    groups: [
+      { label:'Longtail', pkgs:['Longtail Light','Longtail Essencial','Longtail Premium','Longtail Deluxe'] },
+      { label:'Ocidental', pkgs:['Ocidental Light','Ocidental Essencial','Ocidental Clássica'] },
+      { label:'Budista', pkgs:['Budista na Praia Essencial','Budista na Praia Clássica','Budista no Templo'] },
+    ]
+  },
+  proposta: {
+    groups: [{ label:'', pkgs:['Passeio de barco','Picnic na praia','Jantar na Praia'] }]
+  },
+  ensaio: {
+    groups: [{ label:'', pkgs:['Barco e Praia','Praia'] }]
+  }
+};
+
+const LOC_DATA = {
+  // casamento/renovacao
+  'Longtail Light':['Railay','Phi Phi'],
+  'Longtail Essencial':['Railay','Phi Phi'],
+  'Longtail Premium':['Railay','Phi Phi'],
+  'Longtail Deluxe':['Railay','Phi Phi'],
+  'Ocidental Light':['Railay','Phi Phi'],
+  'Ocidental Essencial':['Railay','Phi Phi','Krabi','Phuket'],
+  'Ocidental Clássica':['Railay','Phi Phi','Krabi','Phuket'],
+  'Budista na Praia Essencial':['Railay','Phi Phi','Krabi','Phuket'],
+  'Budista na Praia Clássica':['Railay','Phi Phi','Krabi','Phuket'],
+  'Budista no Templo':['Krabi'],
+  // proposta
+  'Passeio de barco':['Railay','Phi Phi'],
+  'Picnic na praia':['Railay','Poda','Krabi'],
+  'Jantar na Praia':['Krabi'],
+  // ensaio
+  'Barco e Praia':['Railay','Phi Phi'],
+  'Praia':['Railay','Phi Phi'],
+};
+
+// ── EVENT TYPE ──
+function selectEventType(type) {
+  state.eventType = type;
+  state.pkg = '';
+  state.loc = '';
+  document.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  hideError('err-type');
+}
+
+// ── PKG RENDER ──
+function renderPackages() {
+  const data = PKG_DATA[state.eventType];
+  if(!data) return;
+  const container = document.getElementById('pkg-options');
+  container.innerHTML = '';
+  data.groups.forEach(group => {
+    if(group.label) {
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-top:10px;margin-bottom:4px;';
+      lbl.textContent = group.label;
+      container.appendChild(lbl);
+    }
+    group.pkgs.forEach(pkg => {
+      const el = document.createElement('div');
+      el.className = 'pkg-option';
+      el.textContent = pkg;
+      el.onclick = () => selectPkg(pkg, el);
+      container.appendChild(el);
+    });
+  });
+}
+
+function selectPkg(pkg, el) {
+  state.pkg = pkg;
+  state.loc = '';
+  document.querySelectorAll('.pkg-option').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  hideError('err-pkg');
+  renderLocations(pkg);
+}
+
+function renderLocations(pkg) {
+  const locs = LOC_DATA[pkg] || [];
+  const section = document.getElementById('loc-section');
+  const container = document.getElementById('loc-options');
+  container.innerHTML = '';
+  if(!locs.length){ section.classList.add('hidden'); return; }
+  section.classList.remove('hidden');
+  locs.forEach(loc => {
+    const el = document.createElement('div');
+    el.className = 'loc-option';
+    el.textContent = loc;
+    el.onclick = () => { state.loc=loc; document.querySelectorAll('.loc-option').forEach(l=>l.classList.remove('selected')); el.classList.add('selected'); hideError('err-loc'); };
+    container.appendChild(el);
+  });
+  // Auto-select if only one option
+  if(locs.length===1){
+    state.loc = locs[0];
+    container.firstChild.classList.add('selected');
+  }
+}
+
+// ── STEPS ──
+function goStep(n) {
+  // VALIDATE current step
+  if(n===2) {
+    if(!state.eventType){ showError('err-type'); return; }
+    renderPackages();
+  }
+  if(n===3) {
+    if(!state.pkg){ showError('err-pkg'); return; }
+    if(!state.loc){ showError('err-loc'); return; }
+  }
+  if(n===4) {
+    const date = document.getElementById('f-date').value;
+    const tod = document.getElementById('f-tod').value;
+    const guests = document.getElementById('f-guests').value;
+    if(!date){ showError('err-date'); return; }
+    if(!tod){ showError('err-tod'); return; }
+    if(!guests){ showError('err-guests'); return; }
+    state.date = date;
+    state.tod = tod;
+    state.guests = guests;
+    state.addons = document.getElementById('f-addons').value;
+  }
+
+  // Hide all steps
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('step-'+i);
+    if(el) el.classList.add('hidden');
+  });
+  document.getElementById('step-'+n).classList.remove('hidden');
+  updateSteps(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateSteps(current) {
+  [1,2,3,4].forEach(i => {
+    const dot = document.getElementById('sdot-'+i);
+    const line = document.getElementById('sline-'+i);
+    if(i < current){ dot.className='step-dot done'; dot.textContent='✓'; }
+    else if(i===current){ dot.className='step-dot active'; dot.textContent=i; }
+    else{ dot.className='step-dot inactive'; dot.textContent=i; }
+    if(line) line.className = i < current ? 'step-line done' : 'step-line';
+  });
+}
+
+// ── SUBMIT ──
+async function submitForm() {
+  const name1 = document.getElementById('f-name1').value.trim();
+  const name2 = document.getElementById('f-name2').value.trim();
+  const wa = document.getElementById('f-wa').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const cpf1 = document.getElementById('f-cpf1').value.trim();
+  let valid = true;
+  if(!name1){ showError('err-name1'); valid=false; }
+  if(!cpf1){ showError('err-cpf1'); valid=false; }
+  if(!name2){ showError('err-name2'); valid=false; }
+  if(!wa){ showError('err-wa'); valid=false; }
+  if(!email || !email.includes('@')){ showError('err-email'); valid=false; }
+  if(!valid) return;
+
+  state.name1=name1; state.name2=name2;
+  state.cpf1=cpf1;
+  state.cpf2=document.getElementById('f-cpf2').value;
+  state.wa=wa; state.email=email;
+  state.refby=document.getElementById('f-refby').value;
+
+  const submission = {
+    id: Date.now().toString(),
+    submittedAt: new Date().toISOString(),
+    status: 'new',
+    eventType: state.eventType,
+    pkg: state.pkg,
+    loc: state.loc,
+    date: state.date,
+    tod: state.tod,
+    guests: state.guests,
+    addons: state.addons,
+    name1: state.name1,
+    name2: state.name2,
+    cpf1: state.cpf1,
+    cpf2: state.cpf2,
+    wa: state.wa,
+    email: state.email,
+    refby: state.refby,
+  };
+
+  // Save to Google Sheets Submissions tab
+  try {
+    const payload = encodeURIComponent(JSON.stringify({action:'saveSubmission', submission}));
+    await fetch('https://script.google.com/macros/s/AKfycbwrtveOA99aJOGCWoHmqP2CRb_nMKeaQEc5s4I2lPPWRiPB7RDHhjUS4fYzQPwi8WB2cQ/exec' + '?payload=' + payload);
+  } catch(e) {
+    console.warn('Could not sync to Sheets:', e.message);
+  }
+
+  // Show success screen
+  [1,2,3,4].forEach(i => { const el=document.getElementById('step-'+i); if(el) el.classList.add('hidden'); });
+  document.getElementById('steps').classList.add('hidden');
+  document.getElementById('step-success').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── HELPERS ──
+function showError(id){ const el=document.getElementById(id); if(el) el.classList.add('show'); }
+function hideError(id){ const el=document.getElementById(id); if(el) el.classList.remove('show'); }
+</script>
+</body>
+</html>
