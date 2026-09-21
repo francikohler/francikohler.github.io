@@ -369,10 +369,13 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
       <div class="frow frow-3">
         <div class="fgroup"><label class="flabel">Sale price (฿)</label><input class="finput" id="f-sale" type="number" placeholder="e.g. 81000" oninput="updateFinances()"></div>
         <div class="fgroup"><label class="flabel">Invoice / net price (฿)</label><input class="finput" id="f-invoice" type="number" placeholder="Auto-filled by package" oninput="updateFinances()"></div>
-        <div class="fgroup"><label class="flabel">Payment method</label>
-          <select class="fselect" id="f-paymethod">
-            <option value="">Select</option><option>Wise</option><option>Thai Bank</option><option>Pix</option><option>Cash</option>
-          </select>
+        <div class="fgroup"><label class="flabel">Payment method (select all that apply)</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-wise" value="Wise"> Wise</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-bank" value="Thai Bank"> Thai Bank</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-pix" value="Pix"> Pix</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-cash" value="Cash"> Cash</label>
+          </div>
         </div>
       </div>
       <div class="frow frow-3">
@@ -422,16 +425,38 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
       </div>
 
       <div class="fsec">Add-on Services</div>
-      <div class="addons-grid" id="addons-grid">
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Videomaker">🎬 Videomaker</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Hair & Makeup">💄 Hair & Makeup</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Picnic">🧺 Picnic</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Making of">🎥 Making of</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Romantic Dinner">🍽️ Romantic Dinner</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Pre-wedding">📸 Pre-wedding</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Social Media">📱 Social Media</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Hair & Makeup 2x">💄 Hair & Makeup 2x</label>
-        <label class="addon-check" onclick="toggleAddon(this)"><input type="checkbox" value="Extra Bouquet">💐 Extra Bouquet</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px" id="addons-grid">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-video" value="Videomaker" style="accent-color:var(--gold-dark);width:15px;height:15px"> Videomaker</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-hmua" value="Hair & Makeup" style="accent-color:var(--gold-dark);width:15px;height:15px"> Hair & Makeup</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-picnic" value="Picnic" style="accent-color:var(--gold-dark);width:15px;height:15px"> Picnic</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-making" value="Making of" style="accent-color:var(--gold-dark);width:15px;height:15px"> Making of</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-dinner" value="Romantic Dinner" style="accent-color:var(--gold-dark);width:15px;height:15px"> Romantic Dinner</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-prewed" value="Pre-wedding" style="accent-color:var(--gold-dark);width:15px;height:15px"> Pre-wedding</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-social" value="Social Media" style="accent-color:var(--gold-dark);width:15px;height:15px"> Social Media</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-hmua2" value="Hair & Makeup 2x" style="accent-color:var(--gold-dark);width:15px;height:15px"> Hair & Makeup 2x</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-bouquet" value="Extra Bouquet" style="accent-color:var(--gold-dark);width:15px;height:15px"> Extra Bouquet</label>
+      </div>
+
+      <div class="fsec">Image Rights & Social Media</div>
+      <div class="frow frow-2">
+        <div class="fgroup"><label class="flabel">Image use authorized?</label>
+          <select class="fselect" id="f-imgright">
+            <option value="">Not asked yet</option>
+            <option value="yes">Yes — authorized</option>
+            <option value="no">No — not authorized</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">Instagram (if authorized)</label>
+          <input class="finput" id="f-instagram" placeholder="@handle1, @handle2">
+        </div>
+      </div>
+
+      <div class="fsec">Couple's Story & Drink</div>
+      <div class="frow frow-1">
+        <div class="fgroup"><label class="flabel">Couple's story (for ceremony script)</label><textarea class="ftextarea" id="f-story" placeholder="How did they meet, their journey, special details for the ceremony…"></textarea></div>
+      </div>
+      <div class="frow frow-1">
+        <div class="fgroup"><label class="flabel">Toast drink choice</label><input class="finput" id="f-drink" placeholder="ex: Champagne, sparkling wine, juice…"></div>
       </div>
 
       <div class="fsec">Notes</div>
@@ -457,6 +482,7 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-outline" onclick="showTab('tab-pdfs')">📄 Generate PDFs</button>
+      <button class="btn btn-outline" onclick="editCurrentEvent()">✏️ Edit</button>
       <button class="btn btn-danger" onclick="openDeleteModal()">Delete</button>
     </div>
   </div>
@@ -761,10 +787,7 @@ function updateFinances() {
   }
 }
 
-function toggleAddon(el) {
-  el.classList.toggle('selected');
-  el.querySelector('input').checked = el.classList.contains('selected');
-}
+// addons now use native checkboxes
 
 // -- SAVE EVENT --
 function saveNewEvent() {
@@ -780,7 +803,7 @@ function saveNewEvent() {
   const tod = document.getElementById('f-tod').value||'Morning';
   const type = document.getElementById('f-type').value||'Wedding';
   const eventName = `${dateFmt} - ${type} ${n1} + ${n2} - ${pkg} - ${loc} - ${tod}`;
-  const addons = Array.from(document.querySelectorAll('.addon-check.selected')).map(el=>el.querySelector('input').value);
+  const addons = Array.from(document.querySelectorAll('#addons-grid input[type=checkbox]:checked')).map(el=>el.value);
   const checklist = buildChecklist(pkg, loc, addons);
   const sale = parseFloat(document.getElementById('f-sale').value)||0;
   const invoice = parseFloat(document.getElementById('f-invoice').value)||0;
@@ -804,7 +827,7 @@ function saveNewEvent() {
     guests:document.getElementById('f-guests').value,
     time:document.getElementById('f-time').value,
     soldOn:document.getElementById('f-sold').value,
-    paymethod:document.getElementById('f-paymethod').value,
+    paymethod:Array.from(document.querySelectorAll('[id^="pm-"]:checked')).map(el=>el.value).join(', '),
     sale, invoice, deposit, balance, commission,
     depStatus:document.getElementById('f-dep-status').value,
     balStatus:document.getElementById('f-bal-status').value,
@@ -819,6 +842,10 @@ function saveNewEvent() {
     s4:document.getElementById('f-s4').value,
     s5:document.getElementById('f-s5').value,
     notes:document.getElementById('f-notes').value,
+    imgright:document.getElementById('f-imgright').value,
+    instagram:document.getElementById('f-instagram').value,
+    story:document.getElementById('f-story').value,
+    drink:document.getElementById('f-drink').value,
     addons, checklist,
     createdAt:new Date().toISOString(),
     season:getSeason(date),
@@ -830,7 +857,71 @@ function saveNewEvent() {
   openDetail(ev.id);
 }
 
+async function updateExistingEvent(id) {
+  const evIdx = events.findIndex(e => e.id === id);
+  if(evIdx === -1) { showToast('Event not found'); return; }
+  const old = events[evIdx];
+  const addons = Array.from(document.querySelectorAll('#addons-grid input[type=checkbox]:checked')).map(el=>el.value);
+  const n1 = document.getElementById('f-n1').value.trim();
+  const n2 = document.getElementById('f-n2').value.trim();
+  const date = document.getElementById('f-date').value;
+  const pkg = document.getElementById('f-pkg').value;
+  const loc = document.getElementById('f-loc').value;
+  const tod = document.getElementById('f-tod').value || old.tod;
+  const type = document.getElementById('f-type').value || old.type;
+  const d = date.split('-');
+  const dateFmt = d[2]+'/'+d[1]+'/'+d[0].slice(2);
+  const eventName = dateFmt+' - '+type+' '+n1+' + '+n2+' - '+pkg+' - '+loc+' - '+tod;
+  const updated = Object.assign({}, old, {
+    name:eventName, date, type, pkg, loc, tod,
+    name1:n1, name2:n2,
+    fullname1:document.getElementById('f-fn1').value,
+    fullname2:document.getElementById('f-fn2').value,
+    cpf1:document.getElementById('f-cpf1').value,
+    cpf2:document.getElementById('f-cpf2').value,
+    whatsapp:document.getElementById('f-wa').value,
+    email:document.getElementById('f-email').value,
+    hotel:document.getElementById('f-hotel').value,
+    refby:document.getElementById('f-refby').value,
+    mc:document.getElementById('f-mc').value,
+    guests:document.getElementById('f-guests').value,
+    time:document.getElementById('f-time').value,
+    soldOn:document.getElementById('f-sold').value,
+    paymethod:Array.from(document.querySelectorAll('[id^="pm-"]:checked')).map(el=>el.value).join(', '),
+    sale:parseFloat(document.getElementById('f-sale').value)||0,
+    invoice:parseFloat(document.getElementById('f-invoice').value)||0,
+    deposit:parseFloat(document.getElementById('f-deposit').value)||0,
+    depStatus:document.getElementById('f-dep-status').value,
+    balance:parseFloat(document.getElementById('f-balance').value)||0,
+    balStatus:document.getElementById('f-bal-status').value,
+    commission:parseFloat(document.getElementById('f-commission').value)||0,
+    comStatus:document.getElementById('f-com-status').value,
+    bouquet:document.getElementById('f-bouquet').value,
+    head:document.getElementById('f-head').value,
+    shirt:document.getElementById('f-shirt').value,
+    flowerNotes:document.getElementById('f-flower-notes').value,
+    s1:document.getElementById('f-s1').value,
+    s2:document.getElementById('f-s2').value,
+    s3:document.getElementById('f-s3').value,
+    s4:document.getElementById('f-s4').value,
+    s5:document.getElementById('f-s5').value,
+    notes:document.getElementById('f-notes').value,
+    imgright:document.getElementById('f-imgright') ? document.getElementById('f-imgright').value : '',
+    instagram:document.getElementById('f-instagram') ? document.getElementById('f-instagram').value : '',
+    story:document.getElementById('f-story') ? document.getElementById('f-story').value : '',
+    drink:document.getElementById('f-drink') ? document.getElementById('f-drink').value : '',
+    addons, season:getSeason(date),
+  });
+  events[evIdx] = updated;
+  save();
+  sheetsSync({action:'updateEvent', event:flattenEv(updated)});
+  window._editingEventId = null;
+  showToast('Event updated!');
+  openDetail(id);
+}
+
 function resetForm() {
+  document.querySelectorAll('#addons-grid input[type=checkbox],[id^="pm-"]').forEach(el=>{ el.checked=false; });
   document.querySelectorAll('.finput,.fselect,.ftextarea').forEach(el=>{
     if(el.id==='f-dep-status'||el.id==='f-bal-status') el.value='pending';
     else if(el.id==='f-com-status') el.value='n/a';
@@ -907,10 +998,21 @@ function renderChecklist(ev) {
           <label onclick="toggleCheck(${pi},${ii})">${item.t}</label>
           <span class="owner-tag ${item.o==='franci'?'owner-franci':item.o==='kung'?'owner-kung':'owner-both'}">${item.o==='franci'?'🌸 Franci':item.o==='kung'?'🤝 Kung':'👥 Both'}</span>
           ${!item.done && daysToEvent<=7?'<span class="late-tag">⚠️ Urgent</span>':''}
+          <span onclick="deleteTask(${pi},${ii})" style="cursor:pointer;color:var(--text-muted);font-size:13px;padding:2px 5px;border-radius:3px;flex-shrink:0" title="Remove task">✕</span>
         </div>
       `).join('')}
     </div>`;
   }).join('');
+}
+
+function deleteTask(pi, ii) {
+  const ev = events.find(e => e.id === currentId);
+  if(!ev) return;
+  ev.checklist[pi].items.splice(ii, 1);
+  save();
+  sheetsSync({action:'updateEvent', event:flattenEv(ev)});
+  renderChecklist(ev);
+  updateProgress(ev);
 }
 
 function toggleCheck(pi,ii) {
@@ -1265,10 +1367,8 @@ function renderSubmissions(subs) {
 async function markEnquiryDone(idx) {
   const s = (window._currentSubs || [])[idx];
   if(!s) return;
-  // Update status in Sheets
-  const payload = encodeURIComponent(JSON.stringify({action:'updateSubmission', id: s.ID || s.SubmittedAt, status:'done'}));
-  await fetch(SCRIPT_URL + '?payload=' + payload);
-  showToast('Enquiry marked as done');
+  await sheetsSync({action:'updateSubmission', id: s.ID || s.SubmittedAt, status:'done'});
+  showToast('Marked as done');
   loadSubmissions();
 }
 
@@ -1276,10 +1376,77 @@ async function deleteEnquiry(idx) {
   if(!confirm('Delete this enquiry permanently?')) return;
   const s = (window._currentSubs || [])[idx];
   if(!s) return;
-  const payload = encodeURIComponent(JSON.stringify({action:'deleteSubmission', id: s.ID || s.SubmittedAt}));
-  await fetch(SCRIPT_URL + '?payload=' + payload);
+  await sheetsSync({action:'deleteSubmission', id: s.ID || s.SubmittedAt});
   showToast('Enquiry deleted');
   loadSubmissions();
+}
+
+function editCurrentEvent() {
+  const ev = events.find(e => e.id === currentId);
+  if(!ev) return;
+  showPage('new-event');
+  setTimeout(() => {
+    // Pre-fill all fields
+    document.getElementById('f-n1').value = ev.name1||'';
+    document.getElementById('f-n2').value = ev.name2||'';
+    document.getElementById('f-fn1').value = ev.fullname1||'';
+    document.getElementById('f-fn2').value = ev.fullname2||'';
+    document.getElementById('f-cpf1').value = ev.cpf1||'';
+    document.getElementById('f-cpf2').value = ev.cpf2||'';
+    document.getElementById('f-wa').value = ev.whatsapp||'';
+    document.getElementById('f-email').value = ev.email||'';
+    document.getElementById('f-hotel').value = ev.hotel||'';
+    document.getElementById('f-refby').value = ev.refby||'';
+    document.getElementById('f-mc').value = ev.mc||'';
+    document.getElementById('f-guests').value = ev.guests||'';
+    document.getElementById('f-date').value = ev.date||'';
+    document.getElementById('f-time').value = ev.time||'';
+    document.getElementById('f-tod').value = ev.tod||'';
+    document.getElementById('f-type').value = ev.type||'';
+    document.getElementById('f-pkg').value = ev.pkg||'';
+    document.getElementById('f-loc').value = ev.loc||'';
+    document.getElementById('f-sold').value = ev.soldOn||'';
+    document.getElementById('f-sale').value = ev.sale||'';
+    document.getElementById('f-invoice').value = ev.invoice||'';
+    document.getElementById('f-deposit').value = ev.deposit||'';
+    document.getElementById('f-dep-status').value = ev.depStatus||'pending';
+    document.getElementById('f-balance').value = ev.balance||'';
+    document.getElementById('f-bal-status').value = ev.balStatus||'pending';
+    document.getElementById('f-commission').value = ev.commission||'';
+    document.getElementById('f-com-status').value = ev.comStatus||'n/a';
+    document.getElementById('f-bouquet').value = ev.bouquet||'';
+    document.getElementById('f-head').value = ev.head||'';
+    document.getElementById('f-shirt').value = ev.shirt||'';
+    document.getElementById('f-flower-notes').value = ev.flowerNotes||'';
+    document.getElementById('f-s1').value = ev.s1||'';
+    document.getElementById('f-s2').value = ev.s2||'';
+    document.getElementById('f-s3').value = ev.s3||'';
+    document.getElementById('f-s4').value = ev.s4||'';
+    document.getElementById('f-s5').value = ev.s5||'';
+    document.getElementById('f-notes').value = ev.notes||'';
+    if(document.getElementById('f-imgright')) document.getElementById('f-imgright').value = ev.imgright||'';
+    if(document.getElementById('f-instagram')) document.getElementById('f-instagram').value = ev.instagram||'';
+    if(document.getElementById('f-story')) document.getElementById('f-story').value = ev.story||'';
+    if(document.getElementById('f-drink')) document.getElementById('f-drink').value = ev.drink||'';
+    // Payment methods
+    (ev.paymethod||'').split(', ').forEach(pm => {
+      const map = {'Wise':'pm-wise','Thai Bank':'pm-bank','Pix':'pm-pix','Cash':'pm-cash'};
+      if(map[pm]) { const el=document.getElementById(map[pm]); if(el) el.checked=true; }
+    });
+    // Add-ons
+    (ev.addons||[]).forEach(ao => {
+      document.querySelectorAll('#addons-grid input[type=checkbox]').forEach(cb => {
+        if(cb.value === ao) cb.checked = true;
+      });
+    });
+    updateName();
+    // Mark form as editing this event
+    window._editingEventId = ev.id;
+    // Change button text
+    const btn = document.querySelector('[onclick="saveNewEvent()"]');
+    if(btn) btn.textContent = '💾 Save changes';
+    showToast('Edit mode — make changes and save');
+  }, 100);
 }
 
 function createEventFromEnquiry(idx) {
