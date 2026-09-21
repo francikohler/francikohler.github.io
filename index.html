@@ -962,6 +962,7 @@ function renderPDFs(ev) {
       <div class="pdf-card"><div class="pdf-icon">🤝</div><div class="pdf-card-title">Kung's Brief</div><div class="pdf-card-desc">Event info, flowers, her tasks - ready to send via WhatsApp</div><button class="btn btn-primary" style="width:100%" onclick="pdfKung()">Generate PDF</button></div>
       <div class="pdf-card"><div class="pdf-icon">🌸</div><div class="pdf-card-title">Franci's Runsheet</div><div class="pdf-card-desc">Full event overview to take on the wedding day</div><button class="btn btn-primary" style="width:100%" onclick="pdfFranci()">Generate PDF</button></div>
       <div class="pdf-card"><div class="pdf-icon">🎬</div><div class="pdf-card-title">Videomaker Brief</div><div class="pdf-card-desc">Songs, timing, deliverables for the video team</div><button class="btn btn-primary" style="width:100%;${!ev.addons.includes('Videomaker')?'opacity:0.5':''}" onclick="pdfVideo()">Generate PDF</button></div>
+      <div class="pdf-card"><div class="pdf-icon">📜</div><div class="pdf-card-title">Certificate / Certidão</div><div class="pdf-card-desc">Wedding certificate or vow renewal — pre-filled with couple's data, ready to print</div><button class="btn btn-primary" style="width:100%" onclick="openCertificate()">Generate Certificate</button></div>
     </div>
     <p style="font-size:11px;color:var(--text-muted);margin-top:14px">PDFs open in a new tab ready to print, save or share via WhatsApp.</p>
   `;
@@ -988,6 +989,19 @@ function pdfKung() {
     <h3>Your Tasks</h3>${kungTasks.map(t=>`<div class="task"><span class="cb">☐</span><span>${t.t}</span></div>`).join('')}
     ${ev.notes?'<h3>Notes</h3><p style="font-size:13px">'+ev.notes+'</p>':''}
   `);
+}
+
+function openCertificate() {
+  const ev = events.find(e => e.id === currentId);
+  if(!ev) return;
+  const params = new URLSearchParams({
+    name1: ev.fullname1 || ev.name1 || '',
+    name2: ev.fullname2 || ev.name2 || '',
+    date: ev.date || '',
+    loc: ev.loc || '',
+    type: ev.type === 'Vow Renewal' ? 'renewal' : 'wedding'
+  });
+  window.open('https://francikohler.github.io/certificate?' + params.toString(), '_blank');
 }
 
 function pdfFranci() {
@@ -1235,7 +1249,9 @@ function renderSubmissions(subs) {
         '</div>'+
         '<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">'+
           '<div style="font-size:10px;color:var(--text-muted)">'+(s.SubmittedAt?new Date(s.SubmittedAt).toLocaleDateString('pt-BR'):'')+' </div>'+
-          '<button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="createEventFromEnquiry('+i+')">+ Create Event</button>'+
+          '<button class="btn btn-primary" style="font-size:12px;padding:7px 14px;margin-bottom:4px" onclick="createEventFromEnquiry('+i+')">+ Create Event</button>'+
+          '<button class="btn btn-outline" style="font-size:11px;padding:5px 10px;margin-bottom:4px" onclick="markEnquiryDone('+i+')">✓ Mark done</button>'+
+          '<button class="btn" style="font-size:11px;padding:5px 10px;background:var(--danger);color:white" onclick="deleteEnquiry('+i+')">✕ Delete</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -1244,6 +1260,26 @@ function renderSubmissions(subs) {
 
   // Store subs for createEventFromEnquiry
   window._currentSubs = subs;
+}
+
+async function markEnquiryDone(idx) {
+  const s = (window._currentSubs || [])[idx];
+  if(!s) return;
+  // Update status in Sheets
+  const payload = encodeURIComponent(JSON.stringify({action:'updateSubmission', id: s.ID || s.SubmittedAt, status:'done'}));
+  await fetch(SCRIPT_URL + '?payload=' + payload);
+  showToast('Enquiry marked as done');
+  loadSubmissions();
+}
+
+async function deleteEnquiry(idx) {
+  if(!confirm('Delete this enquiry permanently?')) return;
+  const s = (window._currentSubs || [])[idx];
+  if(!s) return;
+  const payload = encodeURIComponent(JSON.stringify({action:'deleteSubmission', id: s.ID || s.SubmittedAt}));
+  await fetch(SCRIPT_URL + '?payload=' + payload);
+  showToast('Enquiry deleted');
+  loadSubmissions();
 }
 
 function createEventFromEnquiry(idx) {
