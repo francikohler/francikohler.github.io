@@ -375,6 +375,8 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
             <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-bank" value="Thai Bank"> Thai Bank</label>
             <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-pix" value="Pix"> Pix</label>
             <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-cash" value="Cash"> Cash</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-revolut" value="Revolut"> Revolut</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="pm-nomad" value="Nomad"> Nomad</label>
           </div>
         </div>
       </div>
@@ -435,6 +437,7 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-social" value="Social Media" style="accent-color:var(--gold-dark);width:15px;height:15px"> Social Media</label>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-hmua2" value="Hair & Makeup 2x" style="accent-color:var(--gold-dark);width:15px;height:15px"> Hair & Makeup 2x</label>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px"><input type="checkbox" id="ao-bouquet" value="Extra Bouquet" style="accent-color:var(--gold-dark);width:15px;height:15px"> Extra Bouquet</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:6px;grid-column:1/-1"><input type="checkbox" id="ao-custom" value="Customization" style="accent-color:var(--gold-dark);width:15px;height:15px"> Customization (describe below in Notes)</label>
       </div>
 
       <div class="fsec">Image Rights & Social Media</div>
@@ -464,6 +467,7 @@ body{font-family:'Inter',sans-serif;background:var(--off-white);color:var(--text
         <div class="fgroup"><label class="flabel">Special requests or observations</label><textarea class="ftextarea" id="f-notes" placeholder="Any special details, requests, things to remember, VIP notes…"></textarea></div>
       </div>
 
+      <input type="hidden" id="f-editing-id" value="">
       <div class="divider"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="showPage('events')">Cancel</button>
@@ -598,6 +602,10 @@ let suppliers = JSON.parse(localStorage.getItem('fk_suppliers') || '{}');
 let currentId = null;
 
 function save() {
+  localStorage.setItem('fk_events_v2', JSON.stringify(events));
+}
+function saveBackup() {
+  // Always keep localStorage as backup
   localStorage.setItem('fk_events_v2', JSON.stringify(events));
 }
 function saveToSheets(ev, isNew) {
@@ -921,6 +929,9 @@ async function updateExistingEvent(id) {
 }
 
 function resetForm() {
+  window._editingEventId = null;
+  const hiddenId = document.getElementById('f-editing-id'); if(hiddenId) hiddenId.value = '';
+  const saveBtn = document.querySelector('[onclick="saveNewEvent()"]'); if(saveBtn) saveBtn.textContent = '🌺 Create event';
   document.querySelectorAll('#addons-grid input[type=checkbox],[id^="pm-"]').forEach(el=>{ el.checked=false; });
   document.querySelectorAll('.finput,.fselect,.ftextarea').forEach(el=>{
     if(el.id==='f-dep-status'||el.id==='f-bal-status') el.value='pending';
@@ -1337,10 +1348,11 @@ function renderSubmissions(subs) {
   subs.map((s,i) => {
     const bg = i % 2 === 0 ? 'white' : 'var(--gold-pale)';
     const d = s.Date ? fmtDate(s.Date) : '';
-    return '<div style="padding:16px 20px;border-bottom:1px solid var(--border);background:'+bg+'">'+
+    const isDone = s.Status === 'done';
+    return '<div style="padding:16px 20px;border-bottom:1px solid var(--border);background:'+(isDone?'#f5f5f5':bg)+';opacity:'+(isDone?'0.6':'1')+'">'+
       '<div style="display:flex;align-items:flex-start;gap:14px">'+
         '<div style="flex:1">'+
-          '<div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:4px">'+(s.Name1||'')+(s.Name2?' + '+s.Name2:'')+'</div>'+
+          '<div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:4px;'+(isDone?'text-decoration:line-through;color:#999':'')+'">&#10003; '+(isDone?'Done — ':'')+''+(s.Name1||'')+(s.Name2?' + '+s.Name2:'')+'</div>'+
           '<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">'+
             (s.EventType||'')+(s.Package?' · '+s.Package:'')+(s.Location?' · '+s.Location:'')+(d?' · '+d:'')+(s.TimeOfDay?' ('+s.TimeOfDay+')':'')+'</div>'+
           '<div style="font-size:12px;color:var(--text-light);margin-bottom:4px">'+
@@ -1430,7 +1442,7 @@ function editCurrentEvent() {
     if(document.getElementById('f-drink')) document.getElementById('f-drink').value = ev.drink||'';
     // Payment methods
     (ev.paymethod||'').split(', ').forEach(pm => {
-      const map = {'Wise':'pm-wise','Thai Bank':'pm-bank','Pix':'pm-pix','Cash':'pm-cash'};
+      const map = {'Wise':'pm-wise','Thai Bank':'pm-bank','Pix':'pm-pix','Cash':'pm-cash','Revolut':'pm-revolut','Nomad':'pm-nomad'};
       if(map[pm]) { const el=document.getElementById(map[pm]); if(el) el.checked=true; }
     });
     // Add-ons
@@ -1442,6 +1454,7 @@ function editCurrentEvent() {
     updateName();
     // Mark form as editing this event
     window._editingEventId = ev.id;
+    const hiddenId = document.getElementById('f-editing-id'); if(hiddenId) hiddenId.value = ev.id;
     // Change button text
     const btn = document.querySelector('[onclick="saveNewEvent()"]');
     if(btn) btn.textContent = '💾 Save changes';
