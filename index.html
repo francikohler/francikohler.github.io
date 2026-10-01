@@ -1571,32 +1571,78 @@ function flattenEv(ev) {
 async function syncFromSheets() {
   const result = await sheetsSync({action:'getEvents'});
   if(result.status === 'ok' && result.events && result.events.length > 0) {
-    const sheetEvents = result.events.map(ev => ({
-      id: String(ev.ID), name: ev.Name, date: ev.Date, soldOn: ev.DateSold,
-      type: ev.Type, pkg: ev.Package, loc: ev.Location, tod: ev.TimeOfDay,
-      time: ev.Time, season: ev.Season, name1: ev.Name1, name2: ev.Name2,
-      fullname1: ev.FullName1||'', fullname2: ev.FullName2||'',
-      cpf1: ev.CPF1||'', cpf2: ev.CPF2||'',
-      whatsapp: ev.WhatsApp||'', email: ev.Email||'', hotel: ev.Hotel||'',
-      refby: ev.RefBy||'', mc: ev.MC||'', guests: ev.Guests||'',
-      paymethod: ev.PayMethod||'',
-      sale: parseFloat(ev.Sale)||0, invoice: parseFloat(ev.Invoice)||0,
-      deposit: parseFloat(ev.Deposit)||0, depStatus: ev.DepStatus||'',
-      balance: parseFloat(ev.Balance)||0, balStatus: ev.BalStatus||'',
-      commission: parseFloat(ev.Commission)||0, comStatus: ev.ComStatus||'',
-      bouquet: ev.Bouquet||'', head: ev.Head||'', shirt: ev.Shirt||'',
-      flowerNotes: ev.FlowerNotes||'',
-      s1: ev.Song1||'', s2: ev.Song2||'', s3: ev.Song3||'',
-      s4: ev.Song4||'', s5: ev.Song5||'',
-      addons: typeof ev.Addons==='string' ? JSON.parse(ev.Addons||'[]') : (ev.Addons||[]),
-      notes: ev.Notes||'',
-      checklist: typeof ev.Checklist==='string' ? JSON.parse(ev.Checklist||'[]') : (ev.Checklist||[]),
-      createdAt: ev.CreatedAt||'',
-    }));
-    // Merge: sheet is source of truth
-    events = sheetEvents;
+    const sheetEvents = result.events.map(ev => {
+      const id = String(ev.ID||'');
+      // Preserve checklist progress from localStorage if it exists
+      const localEv = (JSON.parse(localStorage.getItem('fk_events_v2')||'[]')).find(e=>e.id===id);
+      // Parse checklist from Sheets (may be empty string or JSON)
+      let sheetChecklist = [];
+      try { sheetChecklist = typeof ev.Checklist==='string' ? JSON.parse(ev.Checklist||'[]') : (ev.Checklist||[]); } catch(e) {}
+      // Use local checklist if it has progress, otherwise use sheet checklist
+      // This preserves checkbox ticks even when app updates
+      let checklist = sheetChecklist;
+      if(localEv && localEv.checklist && localEv.checklist.length > 0) {
+        const localDone = localEv.checklist.flatMap(p=>p.items||[]).filter(i=>i.done).length;
+        if(localDone > 0) checklist = localEv.checklist; // preserve progress
+      }
+      return {
+        id, 
+        name: ev.Name||'',
+        date: ev.Date||'',
+        soldOn: ev.DateSold||'',
+        type: ev.Type||'',
+        pkg: ev.Package||'',
+        loc: ev.Location||'',
+        tod: ev.TimeOfDay||'',
+        time: ev.Time||'',
+        season: ev.Season||'',
+        name1: ev.Name1||'',
+        name2: ev.Name2||'',
+        fullname1: ev.FullName1||'',
+        fullname2: ev.FullName2||'',
+        cpf1: ev.CPF1||'',
+        cpf2: ev.CPF2||'',
+        whatsapp: ev.WhatsApp||'',
+        email: ev.Email||'',
+        hotel: ev.Hotel||'',
+        refby: ev.RefBy||'',
+        mc: ev.MC||'',
+        guests: ev.Guests||'',
+        paymethod: ev.PayMethod||'',
+        sale: parseFloat(ev.Sale)||0,
+        invoice: parseFloat(ev.Invoice)||0,
+        deposit: parseFloat(ev.Deposit)||0,
+        depStatus: ev.DepStatus||'pending',
+        balance: parseFloat(ev.Balance)||0,
+        balStatus: ev.BalStatus||'pending',
+        commission: parseFloat(ev.Commission)||0,
+        comStatus: ev.ComStatus||'n/a',
+        bouquet: ev.Bouquet||'',
+        head: ev.Head||'',
+        shirt: ev.Shirt||'',
+        flowerNotes: ev.FlowerNotes||'',
+        s1: ev.Song1||'',
+        s2: ev.Song2||'',
+        s3: ev.Song3||'',
+        s4: ev.Song4||'',
+        s5: ev.Song5||'',
+        addons: (() => { try { return typeof ev.Addons==='string' ? JSON.parse(ev.Addons||'[]') : (ev.Addons||[]); } catch(e) { return []; } })(),
+        notes: ev.Notes||'',
+        imgright: ev.Imgright||'',
+        instagram: ev.Instagram||'',
+        story: ev.Story||'',
+        drink: ev.Drink||'',
+        checklist,
+        createdAt: ev.CreatedAt||'',
+      };
+    });
+    // Merge with localStorage: keep any local events not yet in Sheets
+    const localAll = JSON.parse(localStorage.getItem('fk_events_v2')||'[]');
+    const sheetIds = new Set(sheetEvents.map(e=>e.id));
+    const localOnly = localAll.filter(e=>!sheetIds.has(e.id));
+    events = [...sheetEvents, ...localOnly];
     localStorage.setItem('fk_events_v2', JSON.stringify(events));
-    showToast('✓ Synced with Google Sheets');
+    showToast('Synced');
     renderDashboard();
   }
 }
